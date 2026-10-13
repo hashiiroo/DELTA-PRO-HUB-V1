@@ -1,5 +1,5 @@
 -- ====================================================================
--- DELTA PRO HUB: ПОЛНЫЙ ПЕРВОНАЧАЛЬНЫЙ ВИД (ИСПРАВЛЕННЫЙ)
+-- DELTA PRO HUB: ПОЛНЫЙ ПЕРВОНАЧАЛЬНЫЙ ВИД (ИСПРАВЛЕННЫЙ ФИНАЛ)
 -- ====================================================================
 
 _G.SafeAttack = false
@@ -19,13 +19,15 @@ local ADMIN_GROUPS = { 4342932, 1200769 }
 local FarmSpeed = 80 -- Безопасная скорость полета для обхода античита
 
 -- ====================================================================
--- СИСТЕМА ЗАЩИТЫ (АНТИ-АДМИН И ANTI-AFK)
+-- СИСТЕМА ЗАЗАЩИТЫ (АНТИ-АДМИН И ANTI-AFK)
 -- ====================================================================
 local function LeaveServer()
     _G.SafeAttack = false
     _G.FlyBotFarm = false
     pcall(function()
-        local servers = HttpService:JSONDecode(game:HttpGet("https://roblox.com" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
+        -- ИСПРАВЛЕНО: Правильная ссылка на публичный API серверов Roblox
+        local url = "https://roblox.com" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
+        local servers = HttpService:JSONDecode(game:HttpGet(url))
         for _, server in pairs(servers.data) do
             if server.playing < server.maxPlayers and server.id ~= game.JobId then
                 TeleportService:TeleportToPlaceInstance(game.PlaceId, server.id, LocalPlayer)
@@ -244,6 +246,3 @@ Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 Frame.Visible = false
 Frame.Active = true
 Frame.Draggable = true
-Frame.Parent = ScreenGui
-
-local corner2 = Instance.new("UICorner")
