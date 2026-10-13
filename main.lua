@@ -1,5 +1,5 @@
 -- ====================================================================
--- DH PRO HUB v10.1: CLEAN BASE + RGB CIRCLE + LIGHT TEXT GLOW
+-- DH PRO HUB v10.2: CLEAN BASE + RGB CIRCLE + STRONG TEXT GLOW
 -- ====================================================================
 
 local Players = game:GetService("Players")
@@ -43,13 +43,13 @@ local corner1 = Instance.new("UICorner")
 corner1.CornerRadius = UDim.new(1, 0)
 corner1.Parent = MenuBtn
 
--- 🌟 ДОБАВЛЕНО: ЛЁГКАЯ ПОДСВЕТКА БУКВ ВНУТРИ КРУЖКА
+-- 🌟 ИЗМЕНЕНО: СИЛЬНАЯ И ЯРКАЯ ПОДСВЕТКА БУКВ ВНУТРИ КРУЖКА
 local TextGlow = Instance.new("UIStroke")
-TextGlow.Thickness = 2 -- Мягкая толщина обводки букв
-TextGlow.Color = Color3.fromRGB(255, 80, 80) -- Светло-красное неоновое свечение
-TextGlow.Transparency = 0.5 -- Полупрозрачность (делает подсветку лёгкой)
-TextGlow.TargetToType = Enum.UIStrokeTargetToType or nil -- Защита от старых версий движка
-TextGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual -- Применяется именно к тексту
+TextGlow.Thickness = 3.5 -- Сделали обводку букв толще и заметнее
+TextGlow.Color = Color3.fromRGB(255, 50, 50) -- Более яркий, сочный красный цвет свечения
+TextGlow.Transparency = 0 -- Убрали прозрачность, чтобы подсветка была максимально плотной
+TextGlow.TargetToType = Enum.UIStrokeTargetToType or nil
+TextGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
 TextGlow.Parent = MenuBtn
 
 -- РАДУЖНАЯ ПОДСВЕТКА ВОКРУГ КРУЖКА (RGB-обводка по краям)
@@ -79,12 +79,12 @@ MainFrame.Active = true
 MainFrame.Draggable = true
 local corner2 = Instance.new("UICorner") corner2.CornerRadius = UDim.new(0, 8) corner2.Parent = MainFrame
 
--- Заголовок меню (Без обводки вокруг букв в самом меню)
+-- Заголовок меню
 local Title = Instance.new("TextLabel")
 Title.Parent = MainFrame
 Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
-Title.Text = "  DELTA HUB v10.1"
+Title.Text = "  DELTA HUB v10.2"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.SourceSansBold
 Title.TextSize = 13
@@ -111,4 +111,4 @@ MenuBtn.InputBegan:Connect(function(input)
     end
 end)
 
-print("База v10.1 с подсветкой букв загружена!")
+print("База v10.2 со стабильной сильной подсветкой букв загружена!")
