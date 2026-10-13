@@ -1,7 +1,3 @@
--- ====================================================================
--- DH PREMIUM HUB v7.1: REDZ STYLE REWRITE (SAFE & MULTI-TAB - FIXED)
--- ====================================================================
-
 _G.SafeFlyFarm = false
 _G.SafeAttack = false
 _G.AutoHaki = false
@@ -93,7 +89,7 @@ local function GetClosestEnemy()
     return Closest
 end
 
--- ПОТOК ПОЛЕТА
+-- ПОТОК ПОЛЕТА
 task.spawn(function()
     while true do
         if _G.SafeFlyFarm then
@@ -229,7 +225,7 @@ local c1 = Instance.new("UICorner") c1.CornerRadius = UDim.new(1, 0) c1.Parent =
 local Stroke = Instance.new("UIStroke") Stroke.Thickness = 2.5; Stroke.Parent = MenuBtn
 task.spawn(function() while true do for i = 0, 1, 0.005 do Stroke.Color = Color3.fromHSV(i, 1, 1) task.wait(0.02) end end end)
 
--- Главная панель в стиле Redz (ИСПРАВЛЕНО)
+-- Главная панель в стиле Redz
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 360, 0, 230)
 MainFrame.Position = UDim2.new(0.5, -180, 0.5, -115)
@@ -254,3 +250,11 @@ SideLayout.SortOrder = Enum.SortOrder.LayoutOrder
 SideLayout.Parent = Sidebar
 
 -- Контент
+local ContentArea = Instance.new("Frame")
+ContentArea.Size = UDim2.new(0, 260, 1, -10)
+ContentArea.Position = UDim2.new(0, 95, 0, 5)
+ContentArea.BackgroundTransparency = 1
+ContentArea.Parent = MainFrame
+
+local Pages = {}
+local function CreatePage(id)
