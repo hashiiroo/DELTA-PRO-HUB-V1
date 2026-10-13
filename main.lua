@@ -205,13 +205,13 @@ task.spawn(function()
 end)
 
 -- ====================================================================
--- СТАБИЛЬНЫЙ МОНОЛИТНЫЙ ИНТЕРФЕЙС GUI (ИСПРАВЛЕННЫЙ)
+-- ИНТЕРФЕЙС GUI С РЕЖИМОМ ТЕЛЕФОННОГО ТАЧА (INPUT BEGAN)
 -- ====================================================================
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-if PlayerGui:FindFirstChild("DeltaMobileV6") then PlayerGui.DeltaMobileV6:Destroy() end
+if PlayerGui:FindFirstChild("DeltaMobileTouchV6") then PlayerGui.DeltaMobileTouchV6:Destroy() end
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "DeltaMobileV6"
+ScreenGui.Name = "DeltaMobileTouchV6"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = PlayerGui
 
@@ -219,7 +219,7 @@ ScreenGui.Parent = PlayerGui
 local MenuBtn = Instance.new("TextButton")
 MenuBtn.Size = UDim2.new(0, 55, 0, 55)
 MenuBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
-MenuBtn.BackgroundColor3 = Color3.fromRGB(130, 0, 0) -- Тёмно-красный фон
+MenuBtn.BackgroundColor3 = Color3.fromRGB(130, 0, 0)
 MenuBtn.Text = "DH"
 MenuBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 MenuBtn.Font = Enum.Font.SourceSansBold
@@ -235,12 +235,12 @@ RGBStroke.Thickness = 2.5
 RGBStroke.Parent = MenuBtn
 task.spawn(function() while true do for i = 0, 1, 0.005 do RGBStroke.Color = Color3.fromHSV(i, 1, 1) task.wait(0.02) end end end)
 
--- Панель (Монолитная структура v6 без вкладок)
+-- Панель настроек
 local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 MainFrame.Position = UDim2.new(0.5, -105, 0.5, -125)
-MainFrame.Size = UDim2.new(0, 210, 0, 250) -- Увеличили высоту под 5 кнопок
+MainFrame.Size = UDim2.new(0, 210, 0, 250)
 MainFrame.Visible = false
 MainFrame.Active = true
 MainFrame.Draggable = true
@@ -250,5 +250,7 @@ local Title = Instance.new("TextLabel")
 Title.Parent = MainFrame
 Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
-Title.Text = "  DELTA HUB V6.2"
+Title.Text = "  DELTA HUB V6.3"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 13
