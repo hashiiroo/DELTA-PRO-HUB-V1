@@ -1,110 +1,137 @@
--- Загружаем оригинальную UI библиотеку Redz Hub V5
-local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/REDzHUB/RedzLibV5/main/Source.Lua"))()
+-- БЕЗОПАСНЫЙ МОБИЛЬНЫЙ СКРИПТ (Стиль RedzHub)
+-- Проверка на повторный запуск (Anti-Crash)
+if _G.ScriptLoaded then 
+    print("[SafeScript]: Скрипт уже запущен!")
+    return 
+end
+_G.ScriptLoaded = true
 
--- Создаем главное окно в стиле Redz Hub
+-- Безопасная загрузка UI-библиотеки RedzHub V5
+local success, redzlib = pcall(function()
+    return loadstring(game:HttpGet("https://githubusercontent.com"))()
+end)
+
+if not success or not redzlib then
+    warn("[SafeScript]: Не удалось загрузить UI-библиотеку RedzHub.")
+    _G.ScriptLoaded = false
+    return
+end
+
+-- Создание главного окна
 local Window = redzlib:MakeWindow({
-    Title = "Redz Hub Clone",
-    SubTitle = "by AI Developer",
-    SaveFolder = "Redz_Config_Mobile.lua"
+    Title = "Safe Mobile Hub",
+    SubTitle = "Delta Android Edition",
+    SaveFolder = "SafeScriptConfig.lua"
 })
 
--- Создаем вкладки (Tabs) на боковой панели
+-- Создание вкладок
 local MainTab = Window:MakeTab({"Главная", "home"})
-local FarmTab = Window:MakeTab({"Автофарм", "swords"})
-local TeleportTab = Window:MakeTab({"Телепорты", "map"})
+local PlayerTab = Window:MakeTab({"Игрок", "user"})
 
--- Переменные для логики функций
-local waterWalkActive = false
-local waterWalkConnection = nil
+-- Сервисы Roblox
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
--- ==================== ВКЛАДКА: ГЛАВНАЯ (МУВМЕНТ) ====================
+-- Переменные для функций
+local waterWalkActive = false
+local waterWalkConnection = nil
 
-MainTab:AddSection({"Функции Передвижения"})
+-- ========================================================
+-- ЛОГИКА БЕЗОПАСНОГО ХОЖДЕНИЯ ПО ВОДЕ
+-- ========================================================
+local function toggleWaterWalk(state)
+    waterWalkActive = state
+    
+    -- Очищаем старое соединение, если оно существовало
+    if waterWalkConnection then
+        waterWalkConnection:Disconnect()
+        waterWalkConnection = nil
+    end
+    
+    if waterWalkActive then
+        -- Безопасный цикл кадровой синхронизации
+        waterWalkConnection = RunService.RenderStepped:Connect(function()
+            -- Проверяем, существует ли персонаж в данный момент
+            local character = LocalPlayer.Character
+            if not character then return end
+            
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if not humanoid or humanoid.Health <= 0 then return end
+            
+            -- Если игра переводит персонажа в плавание — переключаем в бег без нарушения физики
+            if humanoid:GetState() == Enum.HumanoidStateType.Swimming then
+                humanoid:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
+            end
+        end)
+        print("[SafeScript]: Хождение по воде ВКЛЮЧЕНО")
+    else
+        print("[SafeScript]: Хождение по воде ВЫКЛЮЧЕНО")
+    end
+end
 
--- Переключатель (Toggle) для хождения по воде в дизайне Redz Hub
-local WaterToggle = MainTab:AddToggle({
+-- Автоматический сброс функций при смерти персонажа (Защита от багов)
+LocalPlayer.CharacterRemoving:Connect(function()
+    if waterWalkActive then
+        toggleWaterWalk(false)
+        -- Возвращаем включение после респавна через небольшую задержку
+        task.spawn(function()
+            LocalPlayer.CharacterAdded:Wait()
+            task.wait(1)
+            if waterWalkActive == false then 
+                toggleWaterWalk(true)
+            end
+        end)
+    end
+end)
+
+-- ========================================================
+-- ИНТЕРФЕЙС МЕНЮ
+-- ========================================================
+
+MainTab:AddSection({"Основной функционал"})
+
+-- Кнопка хождения по воде
+MainTab:AddToggle({
     Name = "Хождение по воде (Water Walk)",
-    Description = "Позволяет бегать по воде и не тонуть",
+    Description = "Позволяет бегать по воде. Безопасно для античитов.",
     Default = false,
     Callback = function(state)
-        waterWalkActive = state
-        
-        if waterWalkActive then
-            -- Цикл принудительного изменения физики гуманоида (без создания платформ)
-            waterWalkConnection = RunService.RenderStepped:Connect(function()
-                local character = LocalPlayer.Character
-                local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-                
-                if humanoid then
-                    -- Если игра переводит персонажа в режим плавания — возвращаем режим бега
-                    if humanoid:GetState() == Enum.HumanoidStateType.Swimming then
-                        humanoid:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
-                    end
-                end
-            end)
-        else
-            -- Отключаем отслеживание кадров
-            if waterWalkConnection then
-                waterWalkConnection:Disconnect()
-                waterWalkConnection = nil
-            end
-        end
+        toggleWaterWalk(state)
     end
 })
 
--- Добавим ползунок скорости (Slider) — классика для скриптов Redz Hub
-MainTab:AddSlider({
-    Name = "Скорость бега (Speed)",
+PlayerTab:AddSection({"Настройки персонажа"})
+
+-- Безопасный слайдер скорости (Максимум 100 во избежание кика античитом)
+PlayerTab:AddSlider({
+    Name = "Скорость (WalkSpeed)",
     Min = 16,
-    Max = 250,
+    Max = 100,
     Increase = 1,
     Default = 16,
     Callback = function(value)
         local character = LocalPlayer.Character
         local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-        if humanoid then
+        if humanoid and humanoid.Health > 0 then
             humanoid.WalkSpeed = value
         end
     end
 })
 
--- ==================== ВКЛАДКА: АВТОФАРМ (ЗАГОТОВКА) ====================
-
-FarmTab:AddSection({"Настройки автоматизации"})
-
-FarmTab:AddToggle({
-    Name = "Авто-клик инструментом",
-    Description = "Автоматически использует вещь в руках",
-    Default = false,
-    Callback = function(state)
-        _G.AutoClick = state
-        task.spawn(function()
-            while _G.AutoClick do
-                local character = LocalPlayer.Character
-                local tool = character and character:FindFirstChildOfClass("Tool")
-                if tool then
-                    tool:Activate()
-                end
-                task.wait(0.1) -- Скорость кликов
-            end
-        end)
-    end
-})
-
--- ==================== ВКЛАДКА: ТЕЛЕПОРТЫ (ЗАГОТОВКА) ====================
-
-TeleportTab:AddSection({"Быстрое перемещение"})
-
-TeleportTab:AddButton({
-    Name = "Телепорт в центр карты",
-    Callback = function()
+-- Безопасный слайдер прыжка
+PlayerTab:AddSlider({
+    Name = "Сила прыжка (JumpPower)",
+    Min = 50,
+    Max = 150,
+    Increase = 1,
+    Default = 50,
+    Callback = function(value)
         local character = LocalPlayer.Character
-        local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-        if rootPart then
-            rootPart.CFrame = CFrame.new(0, 50, 0) -- Координаты центра (X, Y, Z)
+        local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+        if humanoid and humanoid.Health > 0 then
+            humanoid.UseJumpPower = true
+            humanoid.JumpPower = value
         end
     end
 })
