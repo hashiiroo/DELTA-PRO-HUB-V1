@@ -1,123 +1,196 @@
--- ====================================================================
--- DH PRO HUB v11.0: REDZ STYLE CLEAN BASE WITH PULSE INDICATOR
--- ====================================================================
+-- Защита от повторного запуска скрипта
+if game:GetService("CoreGui"):FindFirstChild("DarkRedHubUI") then
+    game:GetService("CoreGui"):FindFirstChild("DarkRedHubUI"):Destroy()
+end
 
-local Players = game:GetService("Players")
-local VirtualUser = game:GetService("VirtualUser")
-local RunService = game:GetService("RunService")
-local LocalPlayer = Players.LocalPlayer
-
--- Автоматический фоновый Anti-AFK (Защита от вылета)
-pcall(function()
-    LocalPlayer.Idled:Connect(function()
-        VirtualUser:CaptureController()
-        VirtualUser:ClickButton2(Vector2.new(0, 0))
-    end)
-end)
-
--- ====================================================================
--- СОЗДАНИЕ ИНТЕРФЕЙСА (БАЗОВАЯ ЧИСТАЯ ПАНЕЛЬ)
--- ====================================================================
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-if PlayerGui:FindFirstChild("DH_BaseLayer") then PlayerGui.DH_BaseLayer:Destroy() end
-
+-- Создание ScreenGui
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "DH_BaseLayer"
+ScreenGui.Name = "DarkRedHubUI"
+ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
-ScreenGui.Parent = PlayerGui
 
--- Круглая кнопка DH с тёмно-красным фоном
-local MenuBtn = Instance.new("TextButton")
-MenuBtn.Size = UDim2.new(0, 55, 0, 55)
-MenuBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
-MenuBtn.BackgroundColor3 = Color3.fromRGB(130, 0, 0) -- Тёмно-красный
-MenuBtn.Text = "DH"
-MenuBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-MenuBtn.Font = Enum.Font.SourceSansBold
-MenuBtn.TextSize = 16
-MenuBtn.Active = true
-MenuBtn.Draggable = true
-MenuBtn.Parent = ScreenGui
+-- ПЕРЕМЕННЫЕ ЦВЕТА
+local DarkRed = Color3.fromRGB(110, 0, 0)
+local BrightRed = Color3.fromRGB(200, 0, 0)
+local GlowColor = Color3.fromRGB(150, 0, 0)
+local BgColor = Color3.fromRGB(20, 20, 20)
 
-local corner1 = Instance.new("UICorner")
-corner1.CornerRadius = UDim.new(1, 0)
-corner1.Parent = MenuBtn
+----------------------------------------------------------------
+-- 1. СОЗДАНИЕ КРУГЛОЙ КНОПКИ (ЛОГОТИПА "DH")
+----------------------------------------------------------------
+local CircleBtn = Instance.new("TextButton")
+CircleBtn.Name = "CircleLogo"
+CircleBtn.Parent = ScreenGui
+CircleBtn.Size = UDim2.new(0, 65, 0, 65) -- Размер как у Redz Hub
+CircleBtn.Position = UDim2.new(0.05, 0, 0.2, 0)
+CircleBtn.BackgroundColor3 = DarkRed
+CircleBtn.Text = ""
+CircleBtn.AutoButtonColor = false
 
--- ПОДСВЕТКА БУКВ ВНУТРИ КРУЖКА
-local TextGlow = Instance.new("UIStroke")
-TextGlow.Thickness = 3.5
-TextGlow.Color = Color3.fromRGB(255, 50, 50)
-TextGlow.Transparency = 0
-TextGlow.TargetToType = Enum.UIStrokeTargetToType or nil
-TextGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-TextGlow.Parent = MenuBtn
+-- Делаем кнопку круглой
+local UICornerBtn = Instance.new("UICorner")
+UICornerBtn.CornerRadius = UDim.new(1, 0)
+UICornerBtn.Parent = CircleBtn
 
--- РАДУЖНАЯ ПОДСВЕТКА ВОКРУГ КРУЖКА (RGB-обводка по краям)
-local RGBStroke = Instance.new("UIStroke")
-RGBStroke.Thickness = 2.5
-RGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-RGBStroke.Parent = MenuBtn
+-- Подсветка (Glow / Тень) вокруг кружка
+local UIGradient = Instance.new("UIGradient")
+UIGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, DarkRed),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 0, 0))
+})
+UIGradient.Rotation = 45
+UIGradient.Parent = CircleBtn
 
-task.spawn(function()
-    while true do
-        for i = 0, 1, 0.005 do
-            RGBStroke.Color = Color3.fromHSV(i, 1, 1)
-            task.wait(0.02)
-        end
-    end
-end)
+-- Обводка для эффекта неонового свечения
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Thickness = 2.5
+UIStroke.Color = GlowColor
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+UIStroke.Parent = CircleBtn
 
--- Главное прямоугольное меню
+-- Буквы "DH" по центру
+local LogoText = Instance.new("TextLabel")
+LogoText.Parent = CircleBtn
+LogoText.Size = UDim2.new(1, 0, 1, 0)
+LogoText.BackgroundTransparency = 1
+LogoText.Text = "DH"
+LogoText.TextColor3 = Color3.fromRGB(255, 230, 230)
+LogoText.TextSize = 24
+LogoText.Font = Enum.Font.GothamBold
+LogoText.TextXAlignment = Enum.TextXAlignment.Center
+LogoText.TextYAlignment = Enum.TextYAlignment.Center
+
+----------------------------------------------------------------
+-- 2. СОЗДАНИЕ МАЛЕНЬКОГО ПУСТОГО МЕНЮ
+----------------------------------------------------------------
 local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
-MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0) -- Ровно центр экрана
-MainFrame.Size = UDim2.new(0, 210, 0, 80) -- Небольшой размер под пустую базу
-MainFrame.Visible = false
-MainFrame.Active = true
-MainFrame.Draggable = true
-local corner2 = Instance.new("UICorner") corner2.CornerRadius = UDim.new(0, 10) corner2.Parent = MainFrame
+MainFrame.Size = UDim2.new(0, 350, 0, 220) -- Аккуратное маленькое меню
+MainFrame.Position = UDim2.new(0.5, -175, 0.5, -110)
+MainFrame.BackgroundColor3 = BgColor
+MainFrame.BorderSizePixel = 0
+MainFrame.Visible = false -- Скрыто при запуске
 
--- Заголовок меню
+-- Скругление углов меню
+local UICornerFrame = Instance.new("UICorner")
+UICornerFrame.CornerRadius = UDim.new(0, 10)
+UICornerFrame.Parent = MainFrame
+
+-- Обводка меню с подсветкой
+local FrameStroke = Instance.new("UIStroke")
+FrameStroke.Thickness = 1.5
+FrameStroke.Color = DarkRed
+FrameStroke.Parent = MainFrame
+
+-- Шапка меню (Верхняя панель)
+local TopBar = Instance.new("Frame")
+TopBar.Name = "TopBar"
+TopBar.Parent = MainFrame
+TopBar.Size = UDim2.new(1, 0, 0, 35)
+TopBar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+TopBar.BorderSizePixel = 0
+
+local TopCorner = Instance.new("UICorner")
+TopCorner.CornerRadius = UDim.new(0, 10)
+TopCorner.Parent = TopBar
+
+-- Название в шапке
 local Title = Instance.new("TextLabel")
-Title.Parent = MainFrame
-Title.Size = UDim2.new(1, 0, 0, 35)
-Title.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
-Title.Text = "  DELTA HUB v11.0"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.Font = Enum.Font.SourceSansBold
-Title.TextSize = 13
+Title.Parent = TopBar
+Title.Size = UDim2.new(1, -40, 1, 0)
+Title.Position = UDim2.new(0, 15, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "DH Hub | Blox Fruits"
+Title.TextColor3 = Color3.fromRGB(230, 230, 230)
+Title.TextSize = 16
+Title.Font = Enum.Font.GothamBold
 Title.TextXAlignment = Enum.TextXAlignment.Left
-local corner3 = Instance.new("UICorner") corner3.CornerRadius = UDim.new(0, 10) corner3.Parent = Title
 
--- Тонкая полоска-индикатор работы (Визуальный пульс) под заголовком
-local PulseBar = Instance.new("Frame")
-PulseBar.Name = "PulseBar"
-PulseBar.Parent = MainFrame
-PulseBar.Position = UDim2.new(0, 0, 0, 35)
-PulseBar.Size = UDim2.new(1, 0, 0, 4)
-PulseBar.BackgroundColor3 = Color3.fromRGB(60, 60, 70) -- Нейтральный серый по умолчанию
-PulseBar.BorderSizePixel = 0
+-- Кнопка закрытия меню (крестик)
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Parent = TopBar
+CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+CloseBtn.Position = UDim2.new(1, -35, 0, 2.5)
+CloseBtn.BackgroundTransparency = 1
+CloseBtn.Text = "×"
+CloseBtn.TextColor3 = BrightRed
+CloseBtn.TextSize = 26
+CloseBtn.Font = Enum.Font.Gotham
 
--- Зона для будущих кнопок
-local BtnArea = Instance.new("Frame")
-BtnArea.Name = "BtnArea"
-BtnArea.Parent = MainFrame
-BtnArea.Position = UDim2.new(0.05, 0, 0.55, 0)
-BtnArea.Size = UDim2.new(0.9, 0, 0.4, 0)
-BtnArea.BackgroundTransparency = 1
+-- Контейнер для будущего контента (скриптов)
+local ContentContainer = Instance.new("Frame")
+ContentContainer.Name = "Container"
+ContentContainer.Parent = MainFrame
+ContentContainer.Size = UDim2.new(1, -20, 1, -50)
+ContentContainer.Position = UDim2.new(0, 10, 0, 45)
+ContentContainer.BackgroundTransparency = 1
 
-local UIListLayout = Instance.new("UIListLayout")
-UIListLayout.Parent = BtnArea
-UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout.Padding = UDim.new(0, 5)
+-- Временный текст-заглушка внутри меню
+local PlaceholderText = Instance.new("TextLabel")
+PlaceholderText.Parent = ContentContainer
+PlaceholderText.Size = UDim2.new(1, 0, 1, 0)
+PlaceholderText.BackgroundTransparency = 1
+PlaceholderText.Text = "[ Место для ваших функций ]"
+PlaceholderText.TextColor3 = Color3.fromRGB(100, 100, 100)
+PlaceholderText.TextSize = 14
+PlaceholderText.Font = Enum.Font.GothamItalic
 
--- Взаимодействие через физический тач смартфона
-MenuBtn.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        MainFrame.Visible = not MainFrame.Visible
-    end
+----------------------------------------------------------------
+-- 3. ЛОГИКА, АНИМАЦИИ И ФУНКЦИОНАЛ
+----------------------------------------------------------------
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+-- Анимация подсветки при наведении на кружок (Hover)
+CircleBtn.MouseEnter:Connect(function()
+    TweenService:Create(UIStroke, TweenInfo.new(0.3), {Color = BrightRed}):Play()
+    TweenService:Create(CircleBtn, TweenInfo.new(0.3), {Size = UDim2.new(0, 68, 0, 68)}):Play()
 end)
 
-print("Новая чистая заготовка v11.0 успешно загружена!")
+CircleBtn.MouseLeave:Connect(function()
+    TweenService:Create(UIStroke, TweenInfo.new(0.3), {Color = GlowColor}):Play()
+    TweenService:Create(CircleBtn, TweenInfo.new(0.3), {Size = UDim2.new(0, 65, 0, 65)}):Play()
+end)
+
+-- Открытие/Закрытие меню по нажатию на кружок
+CircleBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+CloseBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+end)
+
+-- Функция перетаскивания (Drag) для кружка и меню
+local function makeDraggable(frame, dragAnchor)
+    local dragging, dragInput, dragStart, startPos
+    dragAnchor = dragAnchor or frame
+
+    dragAnchor.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then dragging = false end
+            end)
+        end
+    end)
+
+    dragAnchor.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+end
+
+makeDraggable(CircleBtn)
+makeDraggable(MainFrame, TopBar)
