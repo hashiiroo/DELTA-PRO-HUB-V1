@@ -1,4 +1,4 @@
--- DAIKI HUB - ADVANCED COMPACT EDITION (FIXED & TESTED)
+-- DAIKI HUB - ADVANCED COMPACT EDITION (RICH TEXT FIX)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -6,7 +6,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local autoFarmActive = false
 
--- Гарантированная очистка старых интерфейсов перед запуском
+-- Полная очистка старых UI перед запуском
 if LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("DaikiHubUI") then
     LocalPlayer.PlayerGui.DaikiHubUI:Destroy()
 end
@@ -75,31 +75,17 @@ local HeaderCorner = Instance.new("UICorner")
 HeaderCorner.CornerRadius = UDim.new(0, 12)
 HeaderCorner.Parent = Header
 
--- Крупный DAIKI HUB
-local TitleMain = Instance.new("TextLabel")
-TitleMain.Size = UDim2.new(0, 72, 1, 0)
-TitleMain.Position = UDim2.new(0, 12, 0, 0)
-TitleMain.Text = "DAIKI HUB"
-TitleMain.TextColor3 = Color3.fromRGB(255, 255, 255)
-TitleMain.TextSize = 15
-TitleMain.Font = Enum.Font.SourceSansBold
-TitleMain.TextXAlignment = Enum.TextXAlignment.Left
-TitleMain.BackgroundTransparency = 1
-TitleMain.ZIndex = 7
-TitleMain.Parent = Header
-
--- Маленький COMPACT EDITION (стоит строго за первым словом с отступом 5 пикселей)
-local TitleSub = Instance.new("TextLabel")
-TitleSub.Size = UDim2.new(0, 120, 1, 0)
-TitleSub.Position = UDim2.new(0, 89, 0, 0) -- 12 + 72 + 5 = 89
-TitleSub.Text = "| COMPACT EDITION"
-TitleSub.TextColor3 = Color3.fromRGB(200, 200, 200)
-TitleSub.TextSize = 11
-TitleSub.Font = Enum.Font.SourceSans
-TitleSub.TextXAlignment = Enum.TextXAlignment.Left
-TitleSub.BackgroundTransparency = 1
-TitleSub.ZIndex = 7
-TitleSub.Parent = Header
+-- ОБЪЕДИНЕННЫЙ БЕЗОПАСНЫЙ ЗАГОЛОВОК (Через RichText)
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, -80, 1, 0)
+TitleLabel.Position = UDim2.new(0, 12, 0, 0)
+TitleLabel.BackgroundTransparency = 1 -- Защита от белого фона
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.ZIndex = 7
+TitleLabel.RichText = true -- Позволяет настраивать размер внутри строки
+TitleLabel.Text = '<b>DAIKI HUB</b> <font size="11" color="rgb(200,200,200)">| COMPACT EDITION</font>'
+TitleLabel.Parent = Header
 
 -- КНОПКА "СКРЫТЬ" (—)
 local MinimizeButton = Instance.new("TextButton")
@@ -154,7 +140,7 @@ InfoLabel.BackgroundTransparency = 1
 InfoLabel.ZIndex = 6
 InfoLabel.Parent = MainFrame
 
--- РЕГУЛЯТОР РАЗМЕРА МЕНЮ
+-- РЕКУЛЯТОР РАЗМЕРА МЕНЮ
 local ResizeButton = Instance.new("TextButton")
 ResizeButton.Name = "ResizeButton"
 ResizeButton.Size = UDim2.new(0, 16, 0, 16)
@@ -257,4 +243,17 @@ end)
 
 RunService.Stepped:Connect(function()
     if autoFarmActive and LocalPlayer.Character then
-            
+        for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") then part.CanCollide = false end
+        end
+    end
+end)
+
+local function getClosestMob()
+    local closestMob = nil
+    local shortestDistance = 300
+    local character = LocalPlayer.Character
+    local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then return nil end
+
+    
