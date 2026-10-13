@@ -1,4 +1,4 @@
--- DAIKI HUB - ADVANCED COMPACT EDITION (RESTORED & ALIGNED)
+-- DAIKI HUB - COMPACT EDITION (TOTAL STABILITY FIX)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -6,9 +6,10 @@ local LocalPlayer = Players.LocalPlayer
 
 local autoFarmActive = false
 
--- Гарантированная очистка старых UI перед запуском (Защита от наложения)
-if LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("DaikiHubUI") then
-    LocalPlayer.PlayerGui.DaikiHubUI:Destroy()
+-- Абсолютно безопасная очистка старых UI без использования WaitForChild
+local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
+if playerGui and playerGui:FindFirstChild("DaikiHubUI") then
+    playerGui.DaikiHubUI:Destroy()
 end
 
 -- ========================================================
@@ -19,14 +20,14 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "DaikiHubUI"
 ScreenGui.ResetOnSpawn = false
 pcall(function() ScreenGui.IgnoreGuiInset = true end)
-ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.Parent = playerGui
 
--- КРУГЛАЯ КНОПКА МЕНЮ (45х45, статичный фон, RGB только на буквах)
+-- КРУГЛАЯ КНОПКА МЕНЮ (Маленькая, статичный фон, RGB только на буквах)
 local MenuButton = Instance.new("TextButton")
 MenuButton.Name = "MenuButton"
 MenuButton.Size = UDim2.new(0, 45, 0, 45)
 MenuButton.Position = UDim2.new(0.05, 0, 0.2, 0)
-MenuButton.BackgroundColor3 = Color3.fromRGB(110, 0, 0) -- Тёмно-красный фон
+MenuButton.BackgroundColor3 = Color3.fromRGB(110, 0, 0)
 MenuButton.Text = "DH"
 MenuButton.TextSize = 15
 MenuButton.Font = Enum.Font.SourceSansBold
@@ -37,7 +38,7 @@ local ButtonCorner = Instance.new("UICorner")
 ButtonCorner.CornerRadius = UDim.new(1, 0)
 ButtonCorner.Parent = MenuButton
 
--- Внутренний RGB перелив для текста "DH"
+-- Безопасный внутренний радужный перелив для текста "DH"
 task.spawn(function()
     while ScreenGui and ScreenGui.Parent do
         for i = 0, 1, 0.005 do
@@ -75,7 +76,7 @@ local HeaderCorner = Instance.new("UICorner")
 HeaderCorner.CornerRadius = UDim.new(0, 12)
 HeaderCorner.Parent = Header
 
--- Крупный DAIKI HUB (Жесткий фиксированный размер)
+-- Крупный заголовок DAIKI HUB
 local TitleMain = Instance.new("TextLabel")
 TitleMain.Size = UDim2.new(0, 70, 1, 0)
 TitleMain.Position = UDim2.new(0, 12, 0, 0)
@@ -88,10 +89,10 @@ TitleMain.BackgroundTransparency = 1
 TitleMain.ZIndex = 7
 TitleMain.Parent = Header
 
--- Маленький COMPACT EDITION (Привязан строго вплотную: 12 зазор + 70 буквы + 5 отступ = 87)
+-- Маленький COMPACT EDITION (Сближен вплотную, отступ ровно 5 пикселей)
 local TitleSub = Instance.new("TextLabel")
 TitleSub.Size = UDim2.new(0, 120, 1, 0)
-TitleSub.Position = UDim2.new(0, 87, 0, 0) 
+TitleSub.Position = UDim2.new(0, 87, 0, 0) -- 12 + 70 + 5 = 87
 TitleSub.Text = "| COMPACT EDITION"
 TitleSub.TextColor3 = Color3.fromRGB(200, 200, 200)
 TitleSub.TextSize = 11
@@ -101,26 +102,26 @@ TitleSub.BackgroundTransparency = 1
 TitleSub.ZIndex = 7
 TitleSub.Parent = Header
 
--- КНОПКА "СКРЫТЬ" (—)
+-- БЕЗОПАСНАЯ КНОПКА "СКРЫТЬ" (Стандартный минус вместо длинного тире)
 local MinimizeButton = Instance.new("TextButton")
 MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
 MinimizeButton.Position = UDim2.new(1, -65, 0.5, -15)
 MinimizeButton.BackgroundTransparency = 1
-MinimizeButton.Text = "—"
+MinimizeButton.Text = "-"
 MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-MinimizeButton.TextSize = 16
+MinimizeButton.TextSize = 18
 MinimizeButton.Font = Enum.Font.SourceSansBold
 MinimizeButton.ZIndex = 7
 MinimizeButton.Parent = Header
 
--- КНОПКА "ЗАКРЫТЬ" (X)
+-- БЕЗОПАСНАЯ КНОПКА "ЗАКРЫТЬ" (Стандартная буква X вместо Unicode крестика)
 local CloseButton = Instance.new("TextButton")
 CloseButton.Size = UDim2.new(0, 30, 0, 30)
 CloseButton.Position = UDim2.new(1, -35, 0.5, -15)
 CloseButton.BackgroundTransparency = 1
-CloseButton.Text = "✕"
+CloseButton.Text = "X"
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.TextSize = 16
+CloseButton.TextSize = 14
 CloseButton.Font = Enum.Font.SourceSansBold
 CloseButton.ZIndex = 7
 CloseButton.Parent = Header
@@ -171,7 +172,7 @@ CloseButton.Activated:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Перетаскивание кружка
+-- Логика перемещения кружка
 local dragBtnActive, dragBtnInput, dragBtnStart, startBtnPos
 MenuButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -191,7 +192,7 @@ MenuButton.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragBtnActive = false end
 end)
 
--- Перетаскивание всего меню за шапку (Header Drag)
+-- Перетаскивание всего меню за шапку
 local dragFrameActive, dragFrameInput, dragFrameStart, startFramePos
 Header.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -256,4 +257,4 @@ local function toggleAutoFarm(state)
         FarmButton.TextColor3 = Color3.fromRGB(255, 255, 255)
         
         task.spawn(function()
-            while autoFarmActive do
+                
