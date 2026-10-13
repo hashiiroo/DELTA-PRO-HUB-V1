@@ -1,4 +1,4 @@
--- DAIKI HUB - ADVANCED COMPACT EDITION (FIXED TEXT ALIGN)
+-- DAIKI HUB - ADVANCED COMPACT EDITION (DIRECT TEXT ALIGN)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -75,44 +75,31 @@ local HeaderCorner = Instance.new("UICorner")
 HeaderCorner.CornerRadius = UDim.new(0, 12)
 HeaderCorner.Parent = Header
 
--- Контейнер для текста (чтобы они стояли идеально вплотную)
-local TitleContainer = Instance.new("Frame")
-TitleContainer.Size = UDim2.new(1, -80, 1, 0)
-TitleContainer.Position = UDim2.new(0, 12, 0, 0)
-TitleContainer.BackgroundTransparency = 1
-TitleContainer.ZIndex = 7
-TitleContainer.Parent = Header
-
-local UIListLayout = Instance.new("UIListLayout")
-UIListLayout.FillDirection = Enum.FillDirection.Horizontal
-UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-UIListLayout.Padding = UDim.new(0, 5) -- Отступ ровно в 5 пикселей между надписями
-UIListLayout.Parent = TitleContainer
-
--- Крупный DAIKI HUB
+-- Крупный DAIKI HUB (Фиксированный размер под длину слова)
 local TitleMain = Instance.new("TextLabel")
-TitleMain.Size = UDim2.new(0, 72, 1, 0)
+TitleMain.Size = UDim2.new(0, 70, 1, 0)
+TitleMain.Position = UDim2.new(0, 12, 0, 0)
 TitleMain.Text = "DAIKI HUB"
 TitleMain.TextColor3 = Color3.fromRGB(255, 255, 255)
 TitleMain.TextSize = 15
 TitleMain.Font = Enum.Font.SourceSansBold
+TitleMain.TextXAlignment = Enum.TextXAlignment.Left
 TitleMain.BackgroundTransparency = 1
 TitleMain.ZIndex = 7
-TitleMain.LayoutOrder = 1
-TitleMain.Parent = TitleContainer
+TitleMain.Parent = Header
 
--- Маленький COMPACT EDITION (теперь сдвинут вплотную)
+-- Маленький COMPACT EDITION (Размещен жестко впритык к первому слову с отступом 5 пикселей)
 local TitleSub = Instance.new("TextLabel")
 TitleSub.Size = UDim2.new(0, 120, 1, 0)
+TitleSub.Position = UDim2.new(0, 87, 0, 0) -- 12 (отступ) + 70 (длина слова) + 5 (зазор) = 87
 TitleSub.Text = "| COMPACT EDITION"
 TitleSub.TextColor3 = Color3.fromRGB(200, 200, 200)
 TitleSub.TextSize = 11
 TitleSub.Font = Enum.Font.SourceSans
+TitleSub.TextXAlignment = Enum.TextXAlignment.Left
 TitleSub.BackgroundTransparency = 1
 TitleSub.ZIndex = 7
-TitleSub.LayoutOrder = 2
-TitleSub.Parent = TitleContainer
+TitleSub.Parent = Header
 
 -- КНОПКА "СКРЫТЬ" (—)
 local MinimizeButton = Instance.new("TextButton")
@@ -260,4 +247,13 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 UserInputService.InputEnded:Connect(function(input)
-        
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then resizing = false end
+end)
+
+-- ========================================================
+-- ФУНКЦИОНАЛ ФАРМА
+-- ========================================================
+
+RunService.Stepped:Connect(function()
+    if autoFarmActive and LocalPlayer.Character then
+            
