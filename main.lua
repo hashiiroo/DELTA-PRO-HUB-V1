@@ -1,17 +1,10 @@
--- DAIKI HUB - COMPACT EDITION (ABSOLUTE FIX)
+-- DAIKI HUB - COMPACT EDITION (BACK TO WORKING BASE)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 
 local autoFarmActive = false
-
--- Очистка старых интерфейсов перед запуском
-pcall(function()
-    if LocalPlayer.PlayerGui:FindFirstChild("DaikiHubUI") then
-        LocalPlayer.PlayerGui.DaikiHubUI:Destroy()
-    end
-end)
 
 -- ========================================================
 -- СОЗДАНИЕ ИНТЕРФЕЙСА
@@ -23,7 +16,7 @@ ScreenGui.ResetOnSpawn = false
 pcall(function() ScreenGui.IgnoreGuiInset = true end)
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- КРУГЛАЯ КНОПКА МЕНЮ
+-- КРУГЛАЯ КНОПКА МЕНЮ (45х45, статичный фон, RGB только на буквах)
 local MenuButton = Instance.new("TextButton")
 MenuButton.Name = "MenuButton"
 MenuButton.Size = UDim2.new(0, 45, 0, 45)
@@ -39,18 +32,19 @@ local ButtonCorner = Instance.new("UICorner")
 ButtonCorner.CornerRadius = UDim.new(1, 0)
 ButtonCorner.Parent = MenuButton
 
--- RGB перелив только на буквы "DH"
+-- Внутренний RGB перелив для текста "DH"
 task.spawn(function()
-    while ScreenGui and ScreenGui.Parent do
+    while true do
         for i = 0, 1, 0.005 do
-            if not MenuButton then break end
+            if not MenuButton or not ScreenGui then break end
             MenuButton.TextColor3 = Color3.fromHSV(i, 1, 1)
             task.wait(0.02)
         end
+        task.wait()
     end
 end)
 
--- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА
+-- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА (Размер 320х240)
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 320, 0, 240)
@@ -65,7 +59,7 @@ local FrameCorner = Instance.new("UICorner")
 FrameCorner.CornerRadius = UDim.new(0, 12)
 FrameCorner.Parent = MainFrame
 
--- ШАПКА МЕНЮ
+-- ШАПКА МЕНЮ (Зона перетаскивания)
 local Header = Instance.new("Frame")
 Header.Size = UDim2.new(1, 0, 0, 40)
 Header.BackgroundColor3 = Color3.fromRGB(110, 0, 0)
@@ -90,7 +84,7 @@ TitleLabel.ZIndex = 7
 TitleLabel.Text = "DAIKI HUB  |  COMPACT EDITION"
 TitleLabel.Parent = Header
 
--- КНОПКА "СКРЫТЬ" (Исправлена синтаксическая ошибка)
+-- КНОПКА "СКРЫТЬ" (-)
 local MinimizeButton = Instance.new("TextButton")
 MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
 MinimizeButton.Position = UDim2.new(1, -65, 0.5, -15)
@@ -102,7 +96,7 @@ MinimizeButton.Font = Enum.Font.SourceSansBold
 MinimizeButton.ZIndex = 7
 MinimizeButton.Parent = Header
 
--- КНОПКА "ЗАКРЫТЬ"
+-- КНОПКА "ЗАКРЫТЬ" (X)
 local CloseButton = Instance.new("TextButton")
 CloseButton.Size = UDim2.new(0, 30, 0, 30)
 CloseButton.Position = UDim2.new(1, -35, 0.5, -15)
@@ -144,7 +138,7 @@ InfoLabel.ZIndex = 6
 InfoLabel.Parent = MainFrame
 
 -- ========================================================
--- СИСТЕМЫ УПРАВЛЕНИЯ И ИНТЕРФЕЙСА
+-- СИСТЕМЫ УПРАВЛЕНИЯ
 -- ========================================================
 
 MenuButton.Activated:Connect(function()
@@ -254,4 +248,6 @@ local function toggleAutoFarm(state)
                         local backpack = LocalPlayer:FindFirstChild("Backpack")
                         if backpack and not character:FindFirstChildOfClass("Tool") then
                             local combat = backpack:FindFirstChild("Combat") or backpack:FindFirstChildOfClass("Tool")
-                                
+                            if combat then combat.Parent = character end
+                            end
+                            
