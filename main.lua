@@ -1,5 +1,5 @@
 -- ====================================================================
--- DH PREMIUM HUB v7.4: AUTO-OPEN ON EXECUTE (BYPASS TOUCH BUG)
+-- DH PREMIUM HUB v7.5: MULTI-CONTAINER LAYER FIX FOR DELTA
 -- ====================================================================
 
 _G.SafeFlyFarm = false
@@ -203,16 +203,30 @@ task.spawn(function()
     end
 end)
 
--- СОЗДАНИЕ ИНТЕРФЕЙСА
+-- ====================================================================
+-- ПОДГОТОВКА ИНТЕРФЕЙСА (ДВА РАЗДЕЛЬНЫХ СЛОЯ С ВЫСШИМ ПРИОРИТЕТОМ)
+-- ====================================================================
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-if PlayerGui:FindFirstChild("DH_PremiumHub") then PlayerGui.DH_PremiumHub:Destroy() end
 
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "DH_PremiumHub"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.Parent = PlayerGui
+-- Удаляем старые зависшие копии
+if PlayerGui:FindFirstChild("DH_ButtonLayer") then PlayerGui.DH_ButtonLayer:Destroy() end
+if PlayerGui:FindFirstChild("DH_MenuLayer") then PlayerGui.DH_MenuLayer:Destroy() end
 
--- Круглая кнопка DH (теперь служит индикатором работы)
+-- СЛОЙ 1: Только для круглой кнопки DH
+local ButtonLayer = Instance.new("ScreenGui")
+ButtonLayer.Name = "DH_ButtonLayer"
+ButtonLayer.ResetOnSpawn = false
+ButtonLayer.DisplayOrder = 9999 -- Максимальный приоритет поверх игры
+ButtonLayer.Parent = PlayerGui
+
+-- СЛОЙ 2: Отдельный независимый слой только для главного меню
+local MenuLayer = Instance.new("ScreenGui")
+MenuLayer.Name = "DH_MenuLayer"
+MenuLayer.ResetOnSpawn = false
+MenuLayer.DisplayOrder = 10000 -- Ещё выше, чтобы перекрыть кнопку и чат
+MenuLayer.Parent = PlayerGui
+
+-- Круглая кнопка DH (Привязана к ButtonLayer)
 local MenuBtn = Instance.new("TextButton")
 MenuBtn.Size = UDim2.new(0, 55, 0, 55)
 MenuBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
@@ -223,29 +237,12 @@ MenuBtn.Font = Enum.Font.SourceSansBold
 MenuBtn.TextSize = 16
 MenuBtn.Active = true
 MenuBtn.Draggable = true
-MenuBtn.Parent = ScreenGui
+MenuBtn.Parent = ButtonLayer
 
 local c1 = Instance.new("UICorner") c1.CornerRadius = UDim.new(1, 0) c1.Parent = MenuBtn
 local Stroke = Instance.new("UIStroke") Stroke.Thickness = 2.5; Stroke.Parent = MenuBtn
 task.spawn(function() while true do for i = 0, 1, 0.005 do Stroke.Color = Color3.fromHSV(i, 1, 1) task.wait(0.02) end end end)
 
--- Главная панель в стиле Redz
+-- Главная панель в стиле Redz (Привязана к ВЫСШЕМУ MenuLayer и СРАЗУ видима)
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 340, 0, 240) -- Увеличили высоту под кнопку закрытия
-MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
-MainFrame.Visible = true -- ИЗМЕНЕНО: Меню СРАЗУ открыто при старте!
-MainFrame.Active = true
-MainFrame.Draggable = true
-MainFrame.Parent = ScreenGui
-
-local c2 = Instance.new("UICorner") c2.CornerRadius = UDim.new(0, 10) c2.Parent = MainFrame
-
--- Сайдбар
-local Sidebar = Instance.new("Frame")
-Sidebar.Size = UDim2.new(0, 85, 1, -30) -- Оставили место внизу
-Sidebar.BackgroundColor3 = Color3.fromRGB(13, 13, 18)
-Sidebar.Parent = MainFrame
-local c3 = Instance.new("UICorner") c3.CornerRadius = UDim.new(0, 10) c3.Parent = Sidebar
-
+MainFrame.Size = UDim2.new(0, 340, 0, 240)
