@@ -1,16 +1,18 @@
--- DAIKI HUB - FINAL COMPACT EDITION
+-- DAIKI HUB - ADVANCED COMPACT EDITION
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 
 local autoFarmActive = false
 
--- Очистка старых остатков UI перед запуском
-local existingUI = LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("DaikiHubUI")
-if existingUI then existingUI:Destroy() end
+-- Очистка старых интерфейсов перед запуском
+if LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("DaikiHubUI") then
+    LocalPlayer.PlayerGui.DaikiHubUI:Destroy()
+end
 
 -- ========================================================
--- СОЗДАНИЕ ИНТЕРФЕЙСА (ДИЗАЙН "DAIKI HUB")
+-- СОЗДАНИЕ ИНТЕРФЕЙСА
 -- ========================================================
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -19,14 +21,13 @@ ScreenGui.ResetOnSpawn = false
 pcall(function() ScreenGui.IgnoreGuiInset = true end)
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- КРУГЛАЯ КНОПКА МЕНЮ (Маленькая, без подсветки и анимаций)
+-- КРУГЛАЯ КНОПКА МЕНЮ (45х45, статичный фон, RGB на буквах)
 local MenuButton = Instance.new("TextButton")
 MenuButton.Name = "MenuButton"
 MenuButton.Size = UDim2.new(0, 45, 0, 45)
 MenuButton.Position = UDim2.new(0.05, 0, 0.2, 0)
-MenuButton.BackgroundColor3 = Color3.fromRGB(110, 0, 0) -- Строгий тёмно-красный
+MenuButton.BackgroundColor3 = Color3.fromRGB(110, 0, 0)
 MenuButton.Text = "DH"
-MenuButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Белые буквы
 MenuButton.TextSize = 15
 MenuButton.Font = Enum.Font.SourceSansBold
 MenuButton.ZIndex = 10
@@ -36,12 +37,23 @@ local ButtonCorner = Instance.new("UICorner")
 ButtonCorner.CornerRadius = UDim.new(1, 0)
 ButtonCorner.Parent = MenuButton
 
--- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА (Прежний размер 320х240)
+-- Исключительно внутренний RGB перелив для текста "DH"
+task.spawn(function()
+    while ScreenGui and ScreenGui.Parent do
+        for i = 0, 1, 0.005 do
+            if not MenuButton then break end
+            MenuButton.TextColor3 = Color3.fromHSV(i, 1, 1)
+            task.wait(0.02)
+        end
+    end
+end)
+
+-- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 320, 0, 240)
 MainFrame.Position = UDim2.new(0.5, -160, 0.5, -120)
-MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20) -- Прежний цвет меню
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 MainFrame.BorderSizePixel = 0
 MainFrame.Visible = false
 MainFrame.ZIndex = 5
@@ -51,10 +63,10 @@ local FrameCorner = Instance.new("UICorner")
 FrameCorner.CornerRadius = UDim.new(0, 12)
 FrameCorner.Parent = MainFrame
 
--- Шапка меню
+-- ШАПКА МЕНЮ (Зона перетаскивания)
 local Header = Instance.new("Frame")
 Header.Size = UDim2.new(1, 0, 0, 40)
-Header.BackgroundColor3 = Color3.fromRGB(110, 0, 0) -- Тёмно-красная шапка
+Header.BackgroundColor3 = Color3.fromRGB(110, 0, 0)
 Header.BorderSizePixel = 0
 Header.ZIndex = 6
 Header.Parent = MainFrame
@@ -63,24 +75,61 @@ local HeaderCorner = Instance.new("UICorner")
 HeaderCorner.CornerRadius = UDim.new(0, 12)
 HeaderCorner.Parent = Header
 
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -20, 1, 0)
-Title.Position = UDim2.new(0, 12, 0, 0)
-Title.Text = "DAIKI HUB | COMPACT EDITION" -- Кастомное название большими буквами
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 15
-Title.Font = Enum.Font.SourceSansBold
-Title.TextXAlignment = Enum.TextXAlignment.Left
-Title.BackgroundTransparency = 1
-Title.ZIndex = 7
-Title.Parent = Header
+-- Раздельный заголовок: Крупный DAIKI HUB
+local TitleMain = Instance.new("TextLabel")
+TitleMain.Size = UDim2.new(0, 80, 1, 0)
+TitleMain.Position = UDim2.new(0, 12, 0, 0)
+TitleMain.Text = "DAIKI HUB"
+TitleMain.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleMain.TextSize = 15
+TitleMain.Font = Enum.Font.SourceSansBold
+TitleMain.TextXAlignment = Enum.TextXAlignment.Left
+TitleMain.BackgroundTransparency = 1
+TitleMain.ZIndex = 7
+TitleMain.Parent = Header
+
+-- Раздельный заголовок: Маленький COMPACT EDITION
+local TitleSub = Instance.new("TextLabel")
+TitleSub.Size = UDim2.new(0, 150, 1, 0)
+TitleSub.Position = UDim2.new(0, 92, 0, 0) -- Смещение вправо после основного текста
+TitleSub.Text = "| COMPACT EDITION"
+TitleSub.TextColor3 = Color3.fromRGB(200, 200, 200)
+TitleSub.TextSize = 11 -- Уменьшенный размер
+TitleSub.Font = Enum.Font.SourceSans
+TitleSub.TextXAlignment = Enum.TextXAlignment.Left
+TitleSub.BackgroundTransparency = 1
+TitleSub.ZIndex = 7
+TitleSub.Parent = Header
+
+-- КНОПКА "СКРЫТЬ" (—)
+local MinimizeButton = Instance.new("TextButton")
+MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
+MinimizeButton.Position = UDim2.new(1, -65, 0.5, -15)
+MinimizeButton.BackgroundTransparency = 1
+MinimizeButton.Text = "—"
+MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeButton.TextSize = 16
+MinimizeButton.Font = Enum.Font.SourceSansBold
+MinimizeButton.ZIndex = 7
+MinimizeButton.Parent = Header
+
+-- КНОПКА "ЗАКРЫТЬ" (X)
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -35, 0.5, -15)
+CloseButton.BackgroundTransparency = 1
+CloseButton.Text = "✕"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 16
+CloseButton.Font = Enum.Font.SourceSansBold
+CloseButton.ZIndex = 7
+CloseButton.Parent = Header
 
 -- КНОПКА ФАРМА
 local FarmButton = Instance.new("TextButton")
 FarmButton.Size = UDim2.new(0, 280, 0, 50)
 FarmButton.Position = UDim2.new(0.5, -140, 0.35, 0)
 FarmButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-FarmButton.BorderSizePixel = 0
 FarmButton.Text = "Автофарм Ближайших Мобов: ВЫКЛ"
 FarmButton.TextColor3 = Color3.fromRGB(200, 200, 200)
 FarmButton.TextSize = 14
@@ -92,7 +141,7 @@ local FarmCorner = Instance.new("UICorner")
 FarmCorner.CornerRadius = UDim.new(0, 8)
 FarmCorner.Parent = FarmButton
 
--- МАЛЕНЬКОЕ ОПИСАНИЕ ФУНКЦИИ И ЧИСЛО РАДИУСА
+-- ТЕКСТ ОПИСАНИЯ
 local InfoLabel = Instance.new("TextLabel")
 InfoLabel.Size = UDim2.new(1, 0, 0, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.7, 0)
@@ -104,116 +153,104 @@ InfoLabel.BackgroundTransparency = 1
 InfoLabel.ZIndex = 6
 InfoLabel.Parent = MainFrame
 
--- МГНОВЕННЫЙ КЛИК БЕЗ АНИМАЦИИ
+-- РЕГУЛЯТОР РАЗМЕРА МЕНЮ (Resize в правом нижнем углу)
+local ResizeButton = Instance.new("TextButton")
+ResizeButton.Name = "ResizeButton"
+ResizeButton.Size = UDim2.new(0, 16, 0, 16)
+ResizeButton.Position = UDim2.new(1, -16, 1, -16)
+ResizeButton.BackgroundColor3 = Color3.fromRGB(110, 0, 0)
+ResizeButton.Text = "◢"
+ResizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ResizeButton.TextSize = 10
+ResizeButton.ZIndex = 8
+ResizeButton.Parent = MainFrame
+
+local ResizeCorner = Instance.new("UICorner")
+ResizeCorner.CornerRadius = UDim.new(0, 4)
+ResizeCorner.Parent = ResizeButton
+
+-- ========================================================
+-- СИСТЕМЫ УПРАВЛЕНИЯ И ИНТЕРФЕЙСА
+-- ========================================================
+
+-- Переключение видимости по кружку
 MenuButton.Activated:Connect(function()
     MainFrame.Visible = not MainFrame.Visible
 end)
 
--- Перетаскивание кружка по экрану пальцем
-local dragging, dragInput, dragStart, startPos
+-- Действие кнопки "Скрыть" (—)
+MinimizeButton.Activated:Connect(function()
+    MainFrame.Visible = false
+end)
+
+-- Действие кнопки "Закрыть" (X)
+CloseButton.Activated:Connect(function()
+    autoFarmActive = false
+    ScreenGui:Destroy()
+end)
+
+-- Логика перетаскивания кружка
+local dragBtnActive, dragBtnInput, dragBtnStart, startBtnPos
 MenuButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = MenuButton.Position
+        dragBtnActive = true; dragBtnStart = input.Position; startBtnPos = MenuButton.Position
     end
 end)
 MenuButton.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-        dragInput = input
-    end
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragBtnInput = input end
 end)
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if input == dragInput and dragging then
-        local delta = input.Position - dragStart
-        MenuButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragBtnInput and dragBtnActive then
+        local delta = input.Position - dragBtnStart
+        MenuButton.Position = UDim2.new(startBtnPos.X.Scale, startBtnPos.X.Offset + delta.X, startBtnPos.Y.Scale, startBtnPos.Y.Offset + delta.Y)
     end
 end)
 MenuButton.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragBtnActive = false end
+end)
+
+-- СВОБОДНОЕ ПЕРЕМЕЩЕНИЕ ВСЕГО МЕНЮ ЗА СЧЕТ ШАПКИ (Header Drag)
+local dragFrameActive, dragFrameInput, dragFrameStart, startFramePos
+Header.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = false
+        dragFrameActive = true; dragFrameStart = input.Position; startFramePos = MainFrame.Position
     end
 end)
-
--- ========================================================
--- СТАБИЛЬНАЯ ЛОГИКА ФАРМА
--- ========================================================
-
-RunService.Stepped:Connect(function()
-    if autoFarmActive and LocalPlayer.Character then
-        for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = false
-            end
-        end
+Header.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragFrameInput = input end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragFrameInput and dragFrameActive then
+        local delta = input.Position - dragFrameStart
+        MainFrame.Position = UDim2.new(startFramePos.X.Scale, startFramePos.X.Offset + delta.X, startFramePos.Y.Scale, startFramePos.Y.Offset + delta.Y)
     end
 end)
+Header.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragFrameActive = false end
+end)
 
-local function getClosestMob()
-    local closestMob = nil
-    local shortestDistance = 300 -- Число радиуса из описания
-    local character = LocalPlayer.Character
-    local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-    if not rootPart then return nil end
-    
-    local enemiesFolder = workspace:FindFirstChild("Enemies") or workspace
-    
-    for _, object in pairs(enemiesFolder:GetChildren()) do
-        if object:IsA("Model") and object:FindFirstChild("Humanoid") and object ~= character then
-            local enemyRoot = object:FindFirstChild("HumanoidRootPart")
-            local enemyHumanoid = object:FindFirstChild("Humanoid")
-            
-            if enemyRoot and enemyHumanoid and enemyHumanoid.Health > 0 then
-                local distance = (rootPart.Position - enemyRoot.Position).Magnitude
-                if distance < shortestDistance then
-                    shortestDistance = distance
-                    closestMob = object
-                end
-            end
-        end
+-- ИЗМЕНЕНИЕ РАЗМЕРА ОКНА (Resize Control)
+local resizing = false
+local resizeStartPos, resizeStartSize
+ResizeButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        resizing = true; resizeStartPos = input.Position; resizeStartSize = MainFrame.Size
     end
-    return closestMob
-end
-
-local function toggleAutoFarm(state)
-    autoFarmActive = state
-    
-    if autoFarmActive then
-        FarmButton.Text = "Автофарм Ближайших Мобов: ВКЛ"
-        FarmButton.BackgroundColor3 = Color3.fromRGB(110, 0, 0)
-        FarmButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if resizing and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - resizeStartPos
+        -- Ограничиваем минимальный размер (не меньше 260х180), чтобы элементы не ломались
+        local newX = math.max(260, resizeStartSize.X.Offset + delta.X)
+        local newY = math.max(180, resizeStartSize.Y.Offset + delta.Y)
         
-        task.spawn(function()
-            while autoFarmActive do
-                local character = LocalPlayer.Character
-                local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-                
-                if rootPart then
-                    local targetMob = getClosestMob()
-                    
-                    if targetMob and targetMob:FindFirstChild("HumanoidRootPart") then
-                        local backpack = LocalPlayer:FindFirstChild("Backpack")
-                        if backpack and not character:FindFirstChildOfClass("Tool") then
-                            local combat = backpack:FindFirstChild("Combat") or backpack:FindFirstChildOfClass("Tool")
-                            if combat then combat.Parent = character end
-                        end
-                        
-                        rootPart.CFrame = targetMob.HumanoidRootPart.CFrame * CFrame.new(0, 5, 0)
-                        
-                        local tool = character:FindFirstChildOfClass("Tool")
-                        if tool then tool:Activate() end
-                    end
-                end
-                task.wait(0.05)
-            end
-        end)
-    else
-        FarmButton.Text = "Автофарм Ближайших Мобов: ВЫКЛ"
-        FarmButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-        FarmButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+        MainFrame.Size = UDim2.new(0, newX, 0, newY)
+        FarmButton.Size = UDim2.new(0, newX - 40, 0, 50)
+        FarmButton.Position = UDim2.new(0.5, -(newX - 40)/2, 0.35, 0)
+        InfoLabel.Position = UDim2.new(0, 0, 0.65, 0)
     end
-end
-
-FarmButton.Activated:Connect(function()
-    toggleAutoFarm(not autoFarmActive)
 end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then resizing = false end
+end)
+
