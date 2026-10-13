@@ -1,4 +1,4 @@
--- DAIKI HUB - ADVANCED COMPACT EDITION (TOTAL FIX)
+-- DAIKI HUB - COMPACT EDITION (FULLY RESTORED & WORKING)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -6,7 +6,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local autoFarmActive = false
 
--- Гарантированная очистка старых интерфейсов перед запуском
+-- Гарантированная очистка старых UI перед запуском
 if LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("DaikiHubUI") then
     LocalPlayer.PlayerGui.DaikiHubUI:Destroy()
 end
@@ -21,12 +21,12 @@ ScreenGui.ResetOnSpawn = false
 pcall(function() ScreenGui.IgnoreGuiInset = true end)
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- КРУГЛАЯ КНОПКА МЕНЮ
+-- КРУГЛАЯ КНОПКА МЕНЮ (45х45, статичный фон, RGB только на буквах)
 local MenuButton = Instance.new("TextButton")
 MenuButton.Name = "MenuButton"
 MenuButton.Size = UDim2.new(0, 45, 0, 45)
 MenuButton.Position = UDim2.new(0.05, 0, 0.2, 0)
-MenuButton.BackgroundColor3 = Color3.fromRGB(110, 0, 0)
+MenuButton.BackgroundColor3 = Color3.fromRGB(110, 0, 0) -- Тёмно-красный фон
 MenuButton.Text = "DH"
 MenuButton.TextSize = 15
 MenuButton.Font = Enum.Font.SourceSansBold
@@ -48,7 +48,7 @@ task.spawn(function()
     end
 end)
 
--- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА (Фиксированный стабильный размер)
+-- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА (Размер 320х240)
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 320, 0, 240)
@@ -75,7 +75,7 @@ local HeaderCorner = Instance.new("UICorner")
 HeaderCorner.CornerRadius = UDim.new(0, 12)
 HeaderCorner.Parent = Header
 
--- ОБЪЕДИНЕННЫЙ БЕЗОПАСНЫЙ ЗАГОЛОВОК (Через RichText)
+-- ОБЪЕДИНЕННЫЙ БЕЗОПАСНЫЙ ЗАГОЛОВОК (RichText)
 local TitleLabel = Instance.new("TextLabel")
 TitleLabel.Size = UDim2.new(1, -80, 1, 0)
 TitleLabel.Position = UDim2.new(0, 12, 0, 0)
@@ -124,7 +124,8 @@ FarmButton.ZIndex = 6
 FarmButton.Parent = MainFrame
 
 local FarmCorner = Instance.new("UICorner")
-FrameCorner:Clone().Parent = FarmButton -- Копируем закругление для стабильности
+FarmCorner.CornerRadius = UDim.new(0, 8)
+FarmCorner.Parent = FarmButton
 
 -- ТЕКСТ ОПИСАНИЯ
 local InfoLabel = Instance.new("TextLabel")
@@ -156,7 +157,7 @@ CloseButton.Activated:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Логика перетаскивания кружка
+-- Безопасное перетаскивание кружка (Drag)
 local dragBtnActive, dragBtnInput, dragBtnStart, startBtnPos
 MenuButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -176,7 +177,7 @@ MenuButton.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragBtnActive = false end
 end)
 
--- Перетаскивание всего меню за шапку
+-- Безопасное перетаскивание всего меню за шапку (Header Drag)
 local dragFrameActive, dragFrameInput, dragFrameStart, startFramePos
 Header.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -187,7 +188,7 @@ Header.InputChanged:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragFrameInput = input end
 end)
 UserInputService.InputChanged:Connect(function(input)
-    if input == dragFrameInput and dragFrameActive then
+    if dragFrameActive and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         local delta = input.Position - dragFrameStart
         MainFrame.Position = UDim2.new(startFramePos.X.Scale, startFramePos.X.Offset + delta.X, startFramePos.Y.Scale, startFramePos.Y.Offset + delta.Y)
     end
@@ -249,5 +250,4 @@ local function toggleAutoFarm(state)
                     if targetMob and targetMob:FindFirstChild("HumanoidRootPart") then
                         local backpack = LocalPlayer:FindFirstChild("Backpack")
                         if backpack and not character:FindFirstChildOfClass("Tool") then
-                            local combat = backpack:FindFirstChild("Combat") or backpack:FindFirstChildOfClass("Tool")
                                 
