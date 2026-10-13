@@ -1,4 +1,4 @@
--- DAIKI HUB - ADVANCED COMPACT EDITION
+-- DAIKI HUB - ADVANCED COMPACT EDITION (FIXED TEXT ALIGN)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -21,7 +21,7 @@ ScreenGui.ResetOnSpawn = false
 pcall(function() ScreenGui.IgnoreGuiInset = true end)
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- КРУГЛАЯ КНОПКА МЕНЮ (45х45, статичный фон, RGB на буквах)
+-- КРУГЛАЯ КНОПКА МЕНЮ
 local MenuButton = Instance.new("TextButton")
 MenuButton.Name = "MenuButton"
 MenuButton.Size = UDim2.new(0, 45, 0, 45)
@@ -37,7 +37,7 @@ local ButtonCorner = Instance.new("UICorner")
 ButtonCorner.CornerRadius = UDim.new(1, 0)
 ButtonCorner.Parent = MenuButton
 
--- Исключительно внутренний RGB перелив для текста "DH"
+-- Внутренний RGB перелив для текста "DH"
 task.spawn(function()
     while ScreenGui and ScreenGui.Parent do
         for i = 0, 1, 0.005 do
@@ -75,31 +75,44 @@ local HeaderCorner = Instance.new("UICorner")
 HeaderCorner.CornerRadius = UDim.new(0, 12)
 HeaderCorner.Parent = Header
 
--- Раздельный заголовок: Крупный DAIKI HUB
+-- Контейнер для текста (чтобы они стояли идеально вплотную)
+local TitleContainer = Instance.new("Frame")
+TitleContainer.Size = UDim2.new(1, -80, 1, 0)
+TitleContainer.Position = UDim2.new(0, 12, 0, 0)
+TitleContainer.BackgroundTransparency = 1
+TitleContainer.ZIndex = 7
+TitleContainer.Parent = Header
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout.Padding = UDim.new(0, 5) -- Отступ ровно в 5 пикселей между надписями
+UIListLayout.Parent = TitleContainer
+
+-- Крупный DAIKI HUB
 local TitleMain = Instance.new("TextLabel")
-TitleMain.Size = UDim2.new(0, 80, 1, 0)
-TitleMain.Position = UDim2.new(0, 12, 0, 0)
+TitleMain.Size = UDim2.new(0, 72, 1, 0)
 TitleMain.Text = "DAIKI HUB"
 TitleMain.TextColor3 = Color3.fromRGB(255, 255, 255)
 TitleMain.TextSize = 15
 TitleMain.Font = Enum.Font.SourceSansBold
-TitleMain.TextXAlignment = Enum.TextXAlignment.Left
 TitleMain.BackgroundTransparency = 1
 TitleMain.ZIndex = 7
-TitleMain.Parent = Header
+TitleMain.LayoutOrder = 1
+TitleMain.Parent = TitleContainer
 
--- Раздельный заголовок: Маленький COMPACT EDITION
+-- Маленький COMPACT EDITION (теперь сдвинут вплотную)
 local TitleSub = Instance.new("TextLabel")
-TitleSub.Size = UDim2.new(0, 150, 1, 0)
-TitleSub.Position = UDim2.new(0, 92, 0, 0) -- Смещение вправо после основного текста
+TitleSub.Size = UDim2.new(0, 120, 1, 0)
 TitleSub.Text = "| COMPACT EDITION"
 TitleSub.TextColor3 = Color3.fromRGB(200, 200, 200)
-TitleSub.TextSize = 11 -- Уменьшенный размер
+TitleSub.TextSize = 11
 TitleSub.Font = Enum.Font.SourceSans
-TitleSub.TextXAlignment = Enum.TextXAlignment.Left
 TitleSub.BackgroundTransparency = 1
 TitleSub.ZIndex = 7
-TitleSub.Parent = Header
+TitleSub.LayoutOrder = 2
+TitleSub.Parent = TitleContainer
 
 -- КНОПКА "СКРЫТЬ" (—)
 local MinimizeButton = Instance.new("TextButton")
@@ -153,7 +166,7 @@ InfoLabel.BackgroundTransparency = 1
 InfoLabel.ZIndex = 6
 InfoLabel.Parent = MainFrame
 
--- РЕГУЛЯТОР РАЗМЕРА МЕНЮ (Resize в правом нижнем углу)
+-- РЕГУЛЯТОР РАЗМЕРА МЕНЮ
 local ResizeButton = Instance.new("TextButton")
 ResizeButton.Name = "ResizeButton"
 ResizeButton.Size = UDim2.new(0, 16, 0, 16)
@@ -173,17 +186,14 @@ ResizeCorner.Parent = ResizeButton
 -- СИСТЕМЫ УПРАВЛЕНИЯ И ИНТЕРФЕЙСА
 -- ========================================================
 
--- Переключение видимости по кружку
 MenuButton.Activated:Connect(function()
     MainFrame.Visible = not MainFrame.Visible
 end)
 
--- Действие кнопки "Скрыть" (—)
 MinimizeButton.Activated:Connect(function()
     MainFrame.Visible = false
 end)
 
--- Действие кнопки "Закрыть" (X)
 CloseButton.Activated:Connect(function()
     autoFarmActive = false
     ScreenGui:Destroy()
@@ -209,7 +219,7 @@ MenuButton.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragBtnActive = false end
 end)
 
--- СВОБОДНОЕ ПЕРЕМЕЩЕНИЕ ВСЕГО МЕНЮ ЗА СЧЕТ ШАПКИ (Header Drag)
+-- Перетаскивание всего меню за шапку
 local dragFrameActive, dragFrameInput, dragFrameStart, startFramePos
 Header.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -229,7 +239,7 @@ Header.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragFrameActive = false end
 end)
 
--- ИЗМЕНЕНИЕ РАЗМЕРА ОКНА (Resize Control)
+-- Изменение размера окна
 local resizing = false
 local resizeStartPos, resizeStartSize
 ResizeButton.InputBegan:Connect(function(input)
@@ -240,7 +250,6 @@ end)
 UserInputService.InputChanged:Connect(function(input)
     if resizing and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         local delta = input.Position - resizeStartPos
-        -- Ограничиваем минимальный размер (не меньше 260х180), чтобы элементы не ломались
         local newX = math.max(260, resizeStartSize.X.Offset + delta.X)
         local newY = math.max(180, resizeStartSize.Y.Offset + delta.Y)
         
@@ -251,6 +260,4 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then resizing = false end
-end)
-
+        
