@@ -1,4 +1,4 @@
--- DAIKI HUB - COMPACT EDITION (BACK TO WORKING BASE)
+-- DAIKI HUB - COMPACT EDITION (NETWORK COMPATIBLE)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -6,10 +6,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local autoFarmActive = false
 
--- ========================================================
--- СОЗДАНИЕ ИНТЕРФЕЙСА
--- ========================================================
-
+-- Базовое создание ScreenGui без лишних проверок
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "DaikiHubUI"
 ScreenGui.ResetOnSpawn = false
@@ -44,7 +41,7 @@ task.spawn(function()
     end
 end)
 
--- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА (Размер 320х240)
+-- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА (Прежний размер 320х240)
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 320, 0, 240)
@@ -71,7 +68,7 @@ local HeaderCorner = Instance.new("UICorner")
 HeaderCorner.CornerRadius = UDim.new(0, 12)
 HeaderCorner.Parent = Header
 
--- СБЛИЖЕННЫЙ ЗАГОЛОВОК КАПСОМ
+-- БЕЗОПАСНЫЙ ЗАГОЛОВОК (Убраны все спецсимволы, ломающие кодировку HttpGet)
 local TitleLabel = Instance.new("TextLabel")
 TitleLabel.Size = UDim2.new(1, -80, 1, 0)
 TitleLabel.Position = UDim2.new(0, 12, 0, 0)
@@ -81,7 +78,7 @@ TitleLabel.TextSize = 13
 TitleLabel.Font = Enum.Font.SourceSansBold
 TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 TitleLabel.ZIndex = 7
-TitleLabel.Text = "DAIKI HUB  |  COMPACT EDITION"
+TitleLabel.Text = "DAIKI HUB COMPACT EDITION" -- Строго латиница и пробелы
 TitleLabel.Parent = Header
 
 -- КНОПКА "СКРЫТЬ" (-)
