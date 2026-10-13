@@ -1,5 +1,5 @@
 -- ====================================================================
--- DH PREMIEM HUB v7.0: REDZ STYLE REWRITE (SAFE & MULTI-TAB)
+-- DH PREMIUM HUB v7.6: REDZ STYLE REWRITE (RGB CIRCLE + TEXT GLOW)
 -- ====================================================================
 
 _G.SafeFlyFarm = false
@@ -62,7 +62,6 @@ Players.PlayerAdded:Connect(CheckPlayer)
 -- ЛОГИКА ФУНКЦИЙ (ФАРМ, ВОЛИ, ВОДЫ)
 -- ====================================================================
 
--- Функция автоматического включения Воли (Haki)
 task.spawn(function()
     while true do
         if _G.AutoHaki then
@@ -208,7 +207,7 @@ task.spawn(function()
 end)
 
 -- ====================================================================
--- КРАСИВЫЙ ИНТЕРФЕЙС GUI (В СТИЛЕ REDZ HUB)
+-- ИНТЕРФЕЙС GUI (В СТИЛЕ REDZ HUB + RGB И ПОДСВЕТКА БУКВ)
 -- ====================================================================
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 if PlayerGui:FindFirstChild("DH_PremiumHub") then PlayerGui.DH_PremiumHub:Destroy() end
@@ -218,11 +217,11 @@ ScreenGui.Name = "DH_PremiumHub"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = PlayerGui
 
--- Круглая кнопка DH с RGB обводкой
+-- Круглая кнопка DH с тёмно-красным фоном
 local MenuBtn = Instance.new("TextButton")
 MenuBtn.Size = UDim2.new(0, 55, 0, 55)
 MenuBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
-MenuBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+MenuBtn.BackgroundColor3 = Color3.fromRGB(130, 0, 0) -- Тёмно-красный
 MenuBtn.Text = "DH"
 MenuBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 MenuBtn.Font = Enum.Font.SourceSansBold
@@ -232,15 +231,18 @@ MenuBtn.Draggable = true
 MenuBtn.Parent = ScreenGui
 
 local c1 = Instance.new("UICorner") c1.CornerRadius = UDim.new(1, 0) c1.Parent = MenuBtn
-local Stroke = Instance.new("UIStroke") Stroke.Thickness = 2.5; Stroke.Parent = MenuBtn
-task.spawn(function() while true do for i = 0, 1, 0.005 do Stroke.Color = Color3.fromHSV(i, 1, 1) task.wait(0.02) end end end)
 
--- Главное премиум окно в стиле Redz
-local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 360, 0, 230)
-MainFrame.Position = UDim2.new(0.5, -180, 0.5, -115)
-MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
-MainFrame.Visible = false
-MainFrame.Active = true
-MainFrame.Draggable = true
-MainFrame.Parent = ScreenGui
+-- 🌟 СИЛЬНАЯ ПОДСВЕТКА БУКВ ВНУТРИ КРУЖКА
+local TextGlow = Instance.new("UIStroke")
+TextGlow.Thickness = 3.5
+TextGlow.Color = Color3.fromRGB(255, 50, 50)
+TextGlow.Transparency = 0
+TextGlow.TargetToType = Enum.UIStrokeTargetToType or nil
+TextGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+TextGlow.Parent = MenuBtn
+
+-- 🌟 РАДУЖНАЯ ПОДСВЕТКА ВОКРУГ КРУЖКА
+local Stroke = Instance.new("UIStroke") 
+Stroke.Thickness = 2.5
+Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+Stroke.Parent = MenuBtn
