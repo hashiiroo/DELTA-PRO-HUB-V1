@@ -1,248 +1,60 @@
 -- ====================================================================
--- DH PREMIUM HUB v7.5: MULTI-CONTAINER LAYER FIX FOR DELTA
+-- DH PREMIEM HUB v8.0: UTULMATE INJECTOR (BYPASS ALL DISPLAY BUG)
 -- ====================================================================
-
-_G.SafeFlyFarm = false
-_G.SafeAttack = false
-_G.AutoHaki = false
-_G.WalkOnWater = false
-_G.NoWaterDamage = false
 
 local Players = game:GetService("Players")
-local VirtualUser = game:GetService("VirtualUser")
-local RunService = game:GetService("RunService")
-local HttpService = game:GetService("HttpService")
-local TeleportService = game:GetService("TeleportService")
 local LocalPlayer = Players.LocalPlayer
-
-local FarmSpeed = 75
-local ADMIN_GROUPS = { 4342932, 1200769 }
-
--- ANTI-AFK
-pcall(function()
-    LocalPlayer.Idled:Connect(function()
-        VirtualUser:CaptureController()
-        VirtualUser:ClickButton2(Vector2.new(0, 0))
-    end)
-end)
-
--- ANTI-ADMIN
-local function LeaveServer()
-    _G.SafeFlyFarm = false
-    _G.SafeAttack = false
-    pcall(function()
-        local url = "https://roblox.com" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
-        local servers = HttpService:JSONDecode(game:HttpGet(url))
-        for _, server in pairs(servers.data) do
-            if server.playing < server.maxPlayers and server.id ~= game.JobId then
-                TeleportService:TeleportToPlaceInstance(game.PlaceId, server.id, LocalPlayer)
-                break
-            end
-        end
-    end)
-    task.wait(1)
-    LocalPlayer:Kick("DH HUB: Защитный перезапуск!")
-end
-
-local function CheckPlayer(player)
-    if player == LocalPlayer then return end
-    pcall(function()
-        for _, groupId in pairs(ADMIN_GROUPS) do
-            if player:IsInGroup(groupId) then LeaveServer() return end
-        end
-        local name = player.Name:lower()
-        if name:find("admin") or name:find("mod") or name:find("zioles") or name:find("uzoth") then LeaveServer() end
-    end)
-end
-for _, p in pairs(Players:GetPlayers()) do CheckPlayer(p) end
-Players.PlayerAdded:Connect(CheckPlayer)
-
--- АВТО-ХАКИ
-task.spawn(function()
-    while true do
-        if _G.AutoHaki then
-            pcall(function()
-                if LocalPlayer.Character and not LocalPlayer.Character:FindFirstChild("HasBuso") then
-                    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Buso")
-                end
-            end)
-        end
-        task.wait(4)
-    end
-end)
-
--- ПОИСК БОТОВ
-local function GetClosestEnemy()
-    local Closest = nil
-    local MaxDistance = math.huge
-    local character = LocalPlayer.Character
-    if character and character:FindFirstChild("HumanoidRootPart") then
-        local targetsFolder = workspace:FindFirstChild("Enemies") or workspace
-        for _, enemy in pairs(targetsFolder:GetChildren()) do
-            if enemy:IsA("Model") and enemy:FindFirstChild("HumanoidRootPart") and enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
-                if enemy.Name ~= LocalPlayer.Name then
-                    local distance = (enemy.HumanoidRootPart.Position - character.HumanoidRootPart.Position).Magnitude
-                    if distance < MaxDistance and distance < 250 then
-                        MaxDistance = distance
-                        Closest = enemy
-                    end
-                end
-            end
-        end
-    end
-    return Closest
-end
-
--- ПОТОК ПОЛЕТА
-task.spawn(function()
-    while true do
-        if _G.SafeFlyFarm then
-            pcall(function()
-                local character = LocalPlayer.Character
-                if character and character:FindFirstChild("HumanoidRootPart") and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 then
-                    local targetEnemy = GetClosestEnemy()
-                    if targetEnemy then
-                        if not character.HumanoidRootPart:FindFirstChild("FarmVelocity") then
-                            local bv = Instance.new("BodyVelocity")
-                            bv.Name = "FarmVelocity"
-                            bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-                            bv.Velocity = Vector3.new(0, 0, 0)
-                            bv.Parent = character.HumanoidRootPart
-                        end
-                        local targetPos = targetEnemy.HumanoidRootPart.Position + Vector3.new(0, 6, 0)
-                        local distance = (targetPos - character.HumanoidRootPart.Position).Magnitude
-                        if distance > 2 then
-                            character.HumanoidRootPart.FarmVelocity.Velocity = (targetPos - character.HumanoidRootPart.Position).Unit * FarmSpeed
-                        else
-                            character.HumanoidRootPart.FarmVelocity.Velocity = Vector3.new(0, 0, 0)
-                        end
-                        character.HumanoidRootPart.CFrame = CFrame.new(character.HumanoidRootPart.Position, targetEnemy.HumanoidRootPart.Position)
-                        if not character:FindFirstChildOfClass("Tool") then
-                            local tool = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
-                            if tool then character.Humanoid:EquipTool(tool) end
-                        end
-                        VirtualUser:CaptureController()
-                        VirtualUser:ClickButton1(Vector2.new(850, 520))
-                    else
-                        if character.HumanoidRootPart:FindFirstChild("FarmVelocity") then
-                            character.HumanoidRootPart.FarmVelocity.Velocity = Vector3.new(0, 0, 0)
-                        end
-                    end
-                end
-            end)
-        else
-            pcall(function()
-                local character = LocalPlayer.Character
-                if character and character:FindFirstChild("HumanoidRootPart") then
-                    if character.HumanoidRootPart:FindFirstChild("FarmVelocity") then
-                        character.HumanoidRootPart.FarmVelocity:Destroy()
-                    end
-                end
-            end)
-        end
-        task.wait(0.05)
-    end
-end)
-
--- ОБЫЧНЫЙ КЛИКЕР
-task.spawn(function()
-    while true do
-        if _G.SafeAttack and not _G.SafeFlyFarm then
-            pcall(function()
-                local character = LocalPlayer.Character
-                if character and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 then
-                    if not character:FindFirstChildOfClass("Tool") then
-                        local tool = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
-                        if tool then character.Humanoid:EquipTool(tool) end
-                    end
-                    VirtualUser:CaptureController()
-                    VirtualUser:ClickButton1(Vector2.new(850, 520))
-                end
-            end)
-        end
-        task.wait(0.15)
-    end
-end)
-
--- ВОДНАЯ ПЛАТФОРМА
-local WaterPlatform = Instance.new("Part")
-WaterPlatform.Size = Vector3.new(60, 2, 60)
-WaterPlatform.Transparency = 1 
-WaterPlatform.Anchored = true
-WaterPlatform.CanCollide = false
-WaterPlatform.Parent = workspace
-
-RunService.RenderStepped:Connect(function()
-    pcall(function()
-        local character = LocalPlayer.Character
-        if character and character:FindFirstChild("HumanoidRootPart") and _G.WalkOnWater then
-            local pos = character.HumanoidRootPart.Position
-            if pos.Y <= 25 then 
-                WaterPlatform.CFrame = CFrame.new(pos.X, 11, pos.Z)
-                WaterPlatform.CanCollide = true
-            else
-                WaterPlatform.CanCollide = false
-            end
-        else
-            WaterPlatform.CanCollide = false
-        end
-    end)
-end)
-
--- УРОН ВОДЫ
-task.spawn(function()
-    while true do
-        pcall(function()
-            for _, v in pairs(workspace:GetDescendants()) do
-                if v.Name == "Water" or v.Name == "Sea" then
-                    if v:IsA("Part") or v:IsA("MeshPart") then v.CanTouch = not _G.NoWaterDamage end
-                end
-            end
-        end)
-        task.wait(3)
-    end
-end)
-
--- ====================================================================
--- ПОДГОТОВКА ИНТЕРФЕЙСА (ДВА РАЗДЕЛЬНЫХ СЛОЯ С ВЫСШИМ ПРИОРИТЕТОМ)
--- ====================================================================
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- Удаляем старые зависшие копии
-if PlayerGui:FindFirstChild("DH_ButtonLayer") then PlayerGui.DH_ButtonLayer:Destroy() end
-if PlayerGui:FindFirstChild("DH_MenuLayer") then PlayerGui.DH_MenuLayer:Destroy() end
+-- Удаляем старые зависшие копии кнопки, если они есть
+if PlayerGui:FindFirstChild("DH_FinalButton") then PlayerGui.DH_FinalButton:Destroy() end
 
--- СЛОЙ 1: Только для круглой кнопки DH
-local ButtonLayer = Instance.new("ScreenGui")
-ButtonLayer.Name = "DH_ButtonLayer"
-ButtonLayer.ResetOnSpawn = false
-ButtonLayer.DisplayOrder = 9999 -- Максимальный приоритет поверх игры
-ButtonLayer.Parent = PlayerGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DH_FinalButton"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.DisplayOrder = 99999 -- Самый высокий приоритет поверх игры
+ScreenGui.Parent = PlayerGui
 
--- СЛОЙ 2: Отдельный независимый слой только для главного меню
-local MenuLayer = Instance.new("ScreenGui")
-MenuLayer.Name = "DH_MenuLayer"
-MenuLayer.ResetOnSpawn = false
-MenuLayer.DisplayOrder = 10000 -- Ещё выше, чтобы перекрыть кнопку и чат
-MenuLayer.Parent = PlayerGui
-
--- Круглая кнопка DH (Привязана к ButtonLayer)
+-- Твой фирменный кружок DH с темно-красным фоном
 local MenuBtn = Instance.new("TextButton")
 MenuBtn.Size = UDim2.new(0, 55, 0, 55)
 MenuBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
-MenuBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+MenuBtn.BackgroundColor3 = Color3.fromRGB(130, 0, 0) -- Темно-красный фон
 MenuBtn.Text = "DH"
 MenuBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 MenuBtn.Font = Enum.Font.SourceSansBold
 MenuBtn.TextSize = 16
 MenuBtn.Active = true
-MenuBtn.Draggable = true
-MenuBtn.Parent = ButtonLayer
+MenuBtn.Draggable = true -- Можно двигать пальцем по экрану телефона
+MenuBtn.Parent = ScreenGui
 
-local c1 = Instance.new("UICorner") c1.CornerRadius = UDim.new(1, 0) c1.Parent = MenuBtn
-local Stroke = Instance.new("UIStroke") Stroke.Thickness = 2.5; Stroke.Parent = MenuBtn
-task.spawn(function() while true do for i = 0, 1, 0.005 do Stroke.Color = Color3.fromHSV(i, 1, 1) task.wait(0.02) end end end)
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(1, 0)
+corner.Parent = MenuBtn
 
--- Главная панель в стиле Redz (Привязана к ВЫСШЕМУ MenuLayer и СРАЗУ видима)
-local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 340, 0, 240)
+-- Твоя красивая плавная RGB-подсветка вокруг кружка
+local RGBStroke = Instance.new("UIStroke")
+RGBStroke.Thickness = 2.5
+RGBStroke.Parent = MenuBtn
+
+task.spawn(function()
+    while true do
+        for i = 0, 1, 0.005 do
+            RGBStroke.Color = Color3.fromHSV(i, 1, 1)
+            task.wait(0.02)
+        end
+    end
+end)
+
+-- НАЖАТИЕ НА КРУЖОК: Запускает мощный хаб со всеми функциями фарма!
+MenuBtn.MouseButton1Click:Connect(function()
+    print("DH Инжектор: Запуск стороннего топ-хаба...")
+    
+    -- Загружаем полноценный Redz Hub со всеми функциями (автофарм, телепорты, фрукты)
+    loadstring(game:HttpGet("https://githubusercontent.com"))()
+    
+    -- После успешного запуска прячем наш кружок, чтобы он не мешал
+    MenuBtn.Visible = false
+end)
+
+print("DH Инжектор v8.0 успешно запущен! Нажмите на кружок для вызова меню.")
