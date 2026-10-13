@@ -1,4 +1,4 @@
--- DAIKI HUB - COMPACT EDITION (FULLY RESTORED & WORKING)
+-- DAIKI HUB - ADVANCED COMPACT EDITION (RESTORED & ALIGNED)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -6,7 +6,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local autoFarmActive = false
 
--- Гарантированная очистка старых UI перед запуском
+-- Гарантированная очистка старых UI перед запуском (Защита от наложения)
 if LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("DaikiHubUI") then
     LocalPlayer.PlayerGui.DaikiHubUI:Destroy()
 end
@@ -75,17 +75,31 @@ local HeaderCorner = Instance.new("UICorner")
 HeaderCorner.CornerRadius = UDim.new(0, 12)
 HeaderCorner.Parent = Header
 
--- ОБЪЕДИНЕННЫЙ БЕЗОПАСНЫЙ ЗАГОЛОВОК (RichText)
-local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Size = UDim2.new(1, -80, 1, 0)
-TitleLabel.Position = UDim2.new(0, 12, 0, 0)
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-TitleLabel.ZIndex = 7
-TitleLabel.RichText = true
-TitleLabel.Text = '<b>DAIKI HUB</b> <font size="11" color="rgb(200,200,200)">| COMPACT EDITION</font>'
-TitleLabel.Parent = Header
+-- Крупный DAIKI HUB (Жесткий фиксированный размер)
+local TitleMain = Instance.new("TextLabel")
+TitleMain.Size = UDim2.new(0, 70, 1, 0)
+TitleMain.Position = UDim2.new(0, 12, 0, 0)
+TitleMain.Text = "DAIKI HUB"
+TitleMain.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleMain.TextSize = 15
+TitleMain.Font = Enum.Font.SourceSansBold
+TitleMain.TextXAlignment = Enum.TextXAlignment.Left
+TitleMain.BackgroundTransparency = 1
+TitleMain.ZIndex = 7
+TitleMain.Parent = Header
+
+-- Маленький COMPACT EDITION (Привязан строго вплотную: 12 зазор + 70 буквы + 5 отступ = 87)
+local TitleSub = Instance.new("TextLabel")
+TitleSub.Size = UDim2.new(0, 120, 1, 0)
+TitleSub.Position = UDim2.new(0, 87, 0, 0) 
+TitleSub.Text = "| COMPACT EDITION"
+TitleSub.TextColor3 = Color3.fromRGB(200, 200, 200)
+TitleSub.TextSize = 11
+TitleSub.Font = Enum.Font.SourceSans
+TitleSub.TextXAlignment = Enum.TextXAlignment.Left
+TitleSub.BackgroundTransparency = 1
+TitleSub.ZIndex = 7
+TitleSub.Parent = Header
 
 -- КНОПКА "СКРЫТЬ" (—)
 local MinimizeButton = Instance.new("TextButton")
@@ -157,7 +171,7 @@ CloseButton.Activated:Connect(function()
     ScreenGui:Destroy()
 end)
 
--- Безопасное перетаскивание кружка (Drag)
+-- Перетаскивание кружка
 local dragBtnActive, dragBtnInput, dragBtnStart, startBtnPos
 MenuButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -177,7 +191,7 @@ MenuButton.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragBtnActive = false end
 end)
 
--- Безопасное перетаскивание всего меню за шапку (Header Drag)
+-- Перетаскивание всего меню за шапку (Header Drag)
 local dragFrameActive, dragFrameInput, dragFrameStart, startFramePos
 Header.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -243,11 +257,3 @@ local function toggleAutoFarm(state)
         
         task.spawn(function()
             while autoFarmActive do
-                local character = LocalPlayer.Character
-                local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-                if rootPart then
-                    local targetMob = getClosestMob()
-                    if targetMob and targetMob:FindFirstChild("HumanoidRootPart") then
-                        local backpack = LocalPlayer:FindFirstChild("Backpack")
-                        if backpack and not character:FindFirstChildOfClass("Tool") then
-                                
