@@ -1,7 +1,3 @@
--- ====================================================================
--- DH PREMIEM HUB v9.0: REDZ UPDATE CARD STYLE & SAFE FLY FARM
--- ====================================================================
-
 _G.SafeFlyFarm = false
 _G.SafeAttack = false
 _G.AutoHaki = false
@@ -13,13 +9,12 @@ local VirtualUser = game:GetService("VirtualUser")
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
-local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 
 local FarmSpeed = 75
 local ADMIN_GROUPS = { 4342932, 1200769 }
 
--- ANTI-AFK
+-- ANTI-AFK (Облегченный)
 pcall(function()
     LocalPlayer.Idled:Connect(function()
         VirtualUser:CaptureController()
@@ -42,7 +37,7 @@ local function LeaveServer()
         end
     end)
     task.wait(1)
-    LocalPlayer:Kick("DH HUB: Защитный перезапуск!")
+    LocalPlayer:Kick("DH HUB: Защита!")
 end
 
 local function CheckPlayer(player)
@@ -68,7 +63,7 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(4)
+        task.wait(5) -- Увеличили задержку до 5 секунд для снижения нагрузки
     end
 end)
 
@@ -141,7 +136,7 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(0.05)
+        task.wait(0.07) -- Замедлили опрос физики до 0.07 (убирает лаги телефона)
     end
 end)
 
@@ -161,7 +156,7 @@ task.spawn(function()
                 end
             end)
         end
-        task.wait(0.15)
+        task.wait(0.2)
     end
 end)
 
@@ -200,26 +195,24 @@ task.spawn(function()
                 end
             end
         end)
-        task.wait(3)
+        task.wait(4)
     end
 end)
 
--- ====================================================================
--- ИНТЕРФЕЙС В ПРЕМИУМ-СТИЛЕ REDZ UPDATE CARD
--- ====================================================================
+-- СОЗДАНИЕ ИНТЕРФЕЙСА (БЕЗ ТЯЖЕЛЫХ ЦИКЛОВ И АНИМАЦИЙ)
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-if PlayerGui:FindFirstChild("DH_PremiumCard") then PlayerGui.DH_PremiumCard:Destroy() end
+if PlayerGui:FindFirstChild("DH_LiteCard") then PlayerGui.DH_PremiumCard:Destroy() end
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "DH_PremiumCard"
+ScreenGui.Name = "DH_LiteCard"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = PlayerGui
 
--- Круглая плавающая кнопка DH с RGB-подсветкой
+-- Круглая кнопка DH (Темно-красный фон)
 local MenuBtn = Instance.new("TextButton")
 MenuBtn.Size = UDim2.new(0, 55, 0, 55)
 MenuBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
-MenuBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+MenuBtn.BackgroundColor3 = Color3.fromRGB(130, 0, 0)
 MenuBtn.Text = "DH"
 MenuBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 MenuBtn.Font = Enum.Font.SourceSansBold
@@ -229,35 +222,39 @@ MenuBtn.Draggable = true
 MenuBtn.Parent = ScreenGui
 
 local c1 = Instance.new("UICorner") c1.CornerRadius = UDim.new(1, 0) c1.Parent = MenuBtn
-local Stroke = Instance.new("UIStroke") Stroke.Thickness = 2.5; Stroke.Parent = MenuBtn
-task.spawn(function() while true do for i = 0, 1, 0.005 do Stroke.Color = Color3.fromHSV(i, 1, 1) task.wait(0.02) end end end)
 
--- Главная карточка (Стиль Redz Update Card)
+-- Обычная статичная обводка (Не лагает)
+local Stroke = Instance.new("UIStroke") Stroke.Thickness = 2; Stroke.Color = Color3.fromRGB(255, 0, 0); Stroke.Parent = MenuBtn
+
+-- Панель настроек (Прямоугольная, классическая)
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.fromOffset(360, 240)
-MainFrame.Position = UDim2.new(0.5, -180, 0.5, -120)
-MainFrame.BackgroundColor3 = Color3.fromRGB(16, 16, 21)
-MainFrame.BorderSizePixel = 0
+MainFrame.Size = UDim2.new(0, 210, 0, 240)
+MainFrame.Position = UDim2.new(0.5, -105, 0.5, -120)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 MainFrame.Visible = false
 MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.Parent = ScreenGui
 
-local c2 = Instance.new("UICorner") c2.CornerRadius = UDim.new(0, 16) c2.Parent = MainFrame
+local c2 = Instance.new("UICorner") c2.CornerRadius = UDim.new(0, 10) c2.Parent = MainFrame
 
--- Градиент на фоне
-local gradient = Instance.new("UIGradient")
-gradient.Color = ColorSequence.new({
-oke,
-		TweenInfo.new(0.18),
-		{
-			Transparency = 0.55
-		}
-	):Play()
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+Title.Text = "  DELTA HUB v9.1"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 13
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = MainFrame
 
-end)
+local c3 = Instance.new("UICorner") c3.CornerRadius = UDim.new(0, 10) c3.Parent = Title
 
-button.MouseLeave:Connect(function()
+local List = Instance.new("UIListLayout")
+List.Padding = UDim.new(0, 5)
+List.SortOrder = Enum.SortOrder.LayoutOrder
+
+tion()
 
 	TweenService:Create(
 		button,
