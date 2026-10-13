@@ -1,71 +1,84 @@
--- DAIKI HUB - COMPACT EDITION
-if _G.DeltaHubLoaded then return end
-_G.DeltaHubLoaded = true
+-- DAIKI HUB - FIXED COMPACT VERSION
+-- Автоматическое удаление старого интерфейса перед перезапуском
+if game:GetService("CoreGui"):FindFirstChild("DaikiHubUI") then
+    game:GetService("CoreGui").DaikiHubUI:Destroy()
+end
+if game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui"):FindFirstChild("DaikiHubUI") then
+    game:GetService("Players").LocalPlayer.PlayerGui.DaikiHubUI:Destroy()
+end
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
+-- Локальная переменная (теперь не конфликтует с прошлыми запусками)
 local autoFarmActive = false
 
 -- ========================================================
--- ДИЗАЙН "DAIKI HUB" (УМЕНЬШЕННЫЙ RGB КРУЖОК)
+-- ИНТЕРФЕЙС "DAIKI HUB"
 -- ========================================================
 
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "DaikiHubUI"
 ScreenGui.ResetOnSpawn = false
 pcall(function() ScreenGui.IgnoreGuiInset = true end)
-ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- КРУГЛАЯ КНОПКА МЕНЮ (Уменьшена до 50х50)
+-- Безопасный выбор родителя интерфейса для Delta Executor
+if game:GetService("CoreGui") then
+    ScreenGui.Parent = game:GetService("CoreGui")
+else
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+end
+
+-- КРУГЛАЯ КНОПКА МЕНЮ (Компактная 50х50)
 local MenuButton = Instance.new("TextButton")
 MenuButton.Name = "MenuButton"
 MenuButton.Size = UDim2.new(0, 50, 0, 50)
 MenuButton.Position = UDim2.new(0.05, 0, 0.2, 0)
-MenuButton.BackgroundColor3 = Color3.fromRGB(110, 0, 0) -- Тёмно-красный
+MenuButton.BackgroundColor3 = Color3.fromRGB(110, 0, 0) -- Тёмно-красный фон
 MenuButton.Text = "DH"
 MenuButton.TextSize = 18
 MenuButton.Font = Enum.Font.SourceSansBold
+MenuButton.ZIndex = 10
 MenuButton.Parent = ScreenGui
 
 local ButtonCorner = Instance.new("UICorner")
 ButtonCorner.CornerRadius = UDim.new(1, 0)
 ButtonCorner.Parent = MenuButton
 
--- Контурная линия кнопки
+-- Контурная линия для кнопки
 local RGBStroke = Instance.new("UIStroke")
 RGBStroke.Thickness = 2.5
 RGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 RGBStroke.Parent = MenuButton
 
--- Цикл синхронной RGB-подсветки для текста (букв) и контура
+-- Безопасный цикл синхронной RGB-подсветки букв и контура
 task.spawn(function()
-    while true do
+    while ScreenGui and ScreenGui.Parent do
         for i = 0, 1, 0.005 do
             if not MenuButton or not RGBStroke then break end
             local color = Color3.fromHSV(i, 1, 1)
-            RGBStroke.Color = color      -- Подсветка контура
-            MenuButton.TextColor3 = color -- RGB на буквы "DH"
+            RGBStroke.Color = color
+            MenuButton.TextColor3 = color
             task.wait(0.02)
         end
     end
 end)
 
--- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА (Стильный неоновый дизайн)
+-- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 300, 0, 150)
 MainFrame.Position = UDim2.new(0.5, -150, 0.5, -75)
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- Глубокий чёрный
 MainFrame.Visible = false
+MainFrame.ZIndex = 5
 MainFrame.Parent = ScreenGui
 
 local FrameCorner = Instance.new("UICorner")
 FrameCorner.CornerRadius = UDim.new(0, 10)
 FrameCorner.Parent = MainFrame
 
--- Контур для главного меню
 local FrameStroke = Instance.new("UIStroke")
 FrameStroke.Thickness = 1.5
 FrameStroke.Color = Color3.fromRGB(110, 0, 0)
@@ -74,7 +87,8 @@ FrameStroke.Parent = MainFrame
 -- Шапка меню
 local Header = Instance.new("Frame")
 Header.Size = UDim2.new(1, 0, 0, 35)
-Header.BackgroundColor3 = Color3.fromRGB(110, 0, 0) -- Строгий тёмно-красный
+Header.BackgroundColor3 = Color3.fromRGB(110, 0, 0)
+Header.ZIndex = 6
 Header.Parent = MainFrame
 
 local HeaderCorner = Instance.new("UICorner")
@@ -90,9 +104,10 @@ Title.TextSize = 15
 Title.Font = Enum.Font.SourceSansBold
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.BackgroundTransparency = 1
+Title.ZIndex = 7
 Title.Parent = Header
 
--- КНОПКА АВТОФАРМА
+-- КНОПКА ФАРМА
 local FarmButton = Instance.new("TextButton")
 FarmButton.Size = UDim2.new(0, 260, 0, 45)
 FarmButton.Position = UDim2.new(0.5, -130, 0.52, 0)
@@ -101,6 +116,7 @@ FarmButton.Text = "Автофарм Ближайших Мобов: ВЫКЛ"
 FarmButton.TextColor3 = Color3.fromRGB(180, 180, 180)
 FarmButton.TextSize = 13
 FarmButton.Font = Enum.Font.SourceSansBold
+FarmButton.ZIndex = 6
 FarmButton.Parent = MainFrame
 
 local FarmCorner = Instance.new("UICorner")
@@ -117,7 +133,7 @@ MenuButton.Activated:Connect(function()
     MainFrame.Visible = not MainFrame.Visible
 end)
 
--- Система перетаскивания кружка (Drag)
+-- Простая система перетаскивания (Drag)
 local dragging, dragInput, dragStart, startPos
 MenuButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -144,7 +160,7 @@ MenuButton.InputEnded:Connect(function(input)
 end)
 
 -- ========================================================
--- ЛОГИКА ЕДИНСТВЕННОЙ ФУНКЦИИ
+-- ЛОГИКА ФАРМА БЕЗ КОНФЛИКТОВ
 -- ========================================================
 
 RunService.Stepped:Connect(function()
