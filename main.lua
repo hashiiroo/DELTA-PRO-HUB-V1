@@ -1,11 +1,11 @@
--- DAIKI HUB (CLEAN START)
+-- DAIKI HUB - FINAL COMPACT EDITION
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
 local autoFarmActive = false
 
--- Гарантированное удаление старых остатков UI перед запуском
+-- Очистка старых остатков UI перед запуском
 local existingUI = LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("DaikiHubUI")
 if existingUI then existingUI:Destroy() end
 
@@ -19,98 +19,97 @@ ScreenGui.ResetOnSpawn = false
 pcall(function() ScreenGui.IgnoreGuiInset = true end)
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- МИНИ-КРУЖОК МЕНЮ (Уменьшен, без анимаций клика)
+-- КРУГЛАЯ КНОПКА МЕНЮ (Маленькая, без подсветки и анимаций)
 local MenuButton = Instance.new("TextButton")
 MenuButton.Name = "MenuButton"
-MenuButton.Size = UDim2.new(0, 45, 0, 45) -- Уменьшенный размер
+MenuButton.Size = UDim2.new(0, 45, 0, 45)
 MenuButton.Position = UDim2.new(0.05, 0, 0.2, 0)
+MenuButton.BackgroundColor3 = Color3.fromRGB(110, 0, 0) -- Строгий тёмно-красный
 MenuButton.Text = "DH"
+MenuButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Белые буквы
 MenuButton.TextSize = 15
 MenuButton.Font = Enum.Font.SourceSansBold
 MenuButton.ZIndex = 10
 MenuButton.Parent = ScreenGui
 
 local ButtonCorner = Instance.new("UICorner")
-ButtonCorner.CornerRadius = UDim.new(1, 0) -- Круглая форма
+ButtonCorner.CornerRadius = UDim.new(1, 0)
 ButtonCorner.Parent = MenuButton
 
--- ПОЛНОСТЬЮ СИНХРОННЫЙ БЕЗОПАСНЫЙ RGB ДЛЯ БУКВ И ФОНА КРУЖКА
-task.spawn(function()
-    while ScreenGui and ScreenGui.Parent do
-        for i = 0, 1, 0.005 do
-            if not MenuButton then break end
-            local baseColor = Color3.fromHSV(i, 1, 0.5) -- Перелив фона
-            local letterColor = Color3.fromHSV((i + 0.5) % 1, 1, 1) -- Контрастный перелив букв DH
-            
-            MenuButton.BackgroundColor3 = baseColor
-            MenuButton.TextColor3 = letterColor
-            task.wait(0.02)
-        end
-    end
-end)
-
--- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА (Кастомный дизайн Daiki Hub)
+-- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА (Прежний размер 320х240)
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 280, 0, 140)
-MainFrame.Position = UDim2.new(0.5, -140, 0.5, -70)
-MainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 12) -- Глубокий матовый чёрный
+MainFrame.Size = UDim2.new(0, 320, 0, 240)
+MainFrame.Position = UDim2.new(0.5, -160, 0.5, -120)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20) -- Прежний цвет меню
 MainFrame.BorderSizePixel = 0
 MainFrame.Visible = false
 MainFrame.ZIndex = 5
 MainFrame.Parent = ScreenGui
 
 local FrameCorner = Instance.new("UICorner")
-FrameCorner.CornerRadius = UDim.new(0, 8)
+FrameCorner.CornerRadius = UDim.new(0, 12)
 FrameCorner.Parent = MainFrame
 
--- Кастомная шапка Daiki Hub
+-- Шапка меню
 local Header = Instance.new("Frame")
-Header.Size = UDim2.new(1, 0, 0, 35)
-Header.BackgroundColor3 = Color3.fromRGB(140, 0, 0) -- Насыщенный тёмно-красный
+Header.Size = UDim2.new(1, 0, 0, 40)
+Header.BackgroundColor3 = Color3.fromRGB(110, 0, 0) -- Тёмно-красная шапка
 Header.BorderSizePixel = 0
 Header.ZIndex = 6
 Header.Parent = MainFrame
 
 local HeaderCorner = Instance.new("UICorner")
-HeaderCorner.CornerRadius = UDim.new(0, 8)
+HeaderCorner.CornerRadius = UDim.new(0, 12)
 HeaderCorner.Parent = Header
 
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, -20, 1, 0)
 Title.Position = UDim2.new(0, 12, 0, 0)
-Title.Text = "Daiki Hub" -- Изменено по запросу
+Title.Text = "DAIKI HUB | COMPACT EDITION" -- Кастомное название большими буквами
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 14
+Title.TextSize = 15
 Title.Font = Enum.Font.SourceSansBold
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.BackgroundTransparency = 1
 Title.ZIndex = 7
 Title.Parent = Header
 
--- КНОПКА ФАРМА NPC
+-- КНОПКА ФАРМА
 local FarmButton = Instance.new("TextButton")
-FarmButton.Size = UDim2.new(0, 240, 0, 42)
-FarmButton.Position = UDim2.new(0.5, -120, 0.55, 0)
-FarmButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+FarmButton.Size = UDim2.new(0, 280, 0, 50)
+FarmButton.Position = UDim2.new(0.5, -140, 0.35, 0)
+FarmButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 FarmButton.BorderSizePixel = 0
 FarmButton.Text = "Автофарм Ближайших Мобов: ВЫКЛ"
-FarmButton.TextColor3 = Color3.fromRGB(170, 170, 170)
-FarmButton.TextSize = 12
+FarmButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+FarmButton.TextSize = 14
 FarmButton.Font = Enum.Font.SourceSansBold
 FarmButton.ZIndex = 6
 FarmButton.Parent = MainFrame
 
 local FarmCorner = Instance.new("UICorner")
-FarmCorner.CornerRadius = UDim.new(0, 6)
+FarmCorner.CornerRadius = UDim.new(0, 8)
 FarmCorner.Parent = FarmButton
 
--- КЛИК БЕЗ ИЗМЕНЕНИЯ РАЗМЕРОВ (Мгновенный триггер видимости)
+-- МАЛЕНЬКОЕ ОПИСАНИЕ ФУНКЦИИ И ЧИСЛО РАДИУСА
+local InfoLabel = Instance.new("TextLabel")
+InfoLabel.Size = UDim2.new(1, 0, 0, 40)
+InfoLabel.Position = UDim2.new(0, 0, 0.7, 0)
+InfoLabel.Text = "Автоматически экипирует Ближний бой (Melee)\nи удерживает позицию. Радиус: 300 студов."
+InfoLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+InfoLabel.TextSize = 12
+InfoLabel.Font = Enum.Font.SourceSans
+InfoLabel.BackgroundTransparency = 1
+InfoLabel.ZIndex = 6
+InfoLabel.Parent = MainFrame
+
+-- МГНОВЕННЫЙ КЛИК БЕЗ АНИМАЦИИ
 MenuButton.Activated:Connect(function()
     MainFrame.Visible = not MainFrame.Visible
 end)
 
--- Перетаскивание кружка по экрану (Drag Control)
+-- Перетаскивание кружка по экрану пальцем
 local dragging, dragInput, dragStart, startPos
 MenuButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -137,7 +136,7 @@ MenuButton.InputEnded:Connect(function(input)
 end)
 
 -- ========================================================
--- ФУНКЦИОНАЛ ФАРМА
+-- СТАБИЛЬНАЯ ЛОГИКА ФАРМА
 -- ========================================================
 
 RunService.Stepped:Connect(function()
@@ -152,7 +151,7 @@ end)
 
 local function getClosestMob()
     local closestMob = nil
-    local shortestDistance = 300
+    local shortestDistance = 300 -- Число радиуса из описания
     local character = LocalPlayer.Character
     local rootPart = character and character:FindFirstChild("HumanoidRootPart")
     if not rootPart then return nil end
@@ -181,7 +180,7 @@ local function toggleAutoFarm(state)
     
     if autoFarmActive then
         FarmButton.Text = "Автофарм Ближайших Мобов: ВКЛ"
-        FarmButton.BackgroundColor3 = Color3.fromRGB(140, 0, 0)
+        FarmButton.BackgroundColor3 = Color3.fromRGB(110, 0, 0)
         FarmButton.TextColor3 = Color3.fromRGB(255, 255, 255)
         
         task.spawn(function()
@@ -210,8 +209,8 @@ local function toggleAutoFarm(state)
         end)
     else
         FarmButton.Text = "Автофарм Ближайших Мобов: ВЫКЛ"
-        FarmButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-        FarmButton.TextColor3 = Color3.fromRGB(170, 170, 170)
+        FarmButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        FarmButton.TextColor3 = Color3.fromRGB(200, 200, 200)
     end
 end
 
