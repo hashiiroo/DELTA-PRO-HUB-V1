@@ -1,18 +1,26 @@
 -- ====================================================================
--- DELTA PRO HUB v6.1: RGB CIRCLE + "DH" NAME + SAFE FLY FARM
+-- DH PREMIEM HUB v7.0: REDZ STYLE REWRITE (SAFE & MULTI-TAB)
 -- ====================================================================
 
 _G.SafeFlyFarm = false
+_G.SafeAttack = false
+_G.AutoHaki = false
+_G.WalkOnWater = false
+_G.NoWaterDamage = false
 
 local Players = game:GetService("Players")
 local VirtualUser = game:GetService("VirtualUser")
 local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
 local LocalPlayer = Players.LocalPlayer
 
 local FarmSpeed = 75
+local ADMIN_GROUPS = { 4342932, 1200769 }
 
--- ANTI-AFK
+-- ====================================================================
+-- СИСТЕМЫ БЕЗОПАСНОСТИ (ANTI-AFK & ANTI-ADMIN)
+-- ====================================================================
 pcall(function()
     LocalPlayer.Idled:Connect(function()
         VirtualUser:CaptureController()
@@ -20,7 +28,56 @@ pcall(function()
     end)
 end)
 
--- ПОИСК БОТОВ
+local function LeaveServer()
+    _G.SafeFlyFarm = false
+    _G.SafeAttack = false
+    pcall(function()
+        local url = "https://roblox.com" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
+        local servers = HttpService:JSONDecode(game:HttpGet(url))
+        for _, server in pairs(servers.data) do
+            if server.playing < server.maxPlayers and server.id ~= game.JobId then
+                TeleportService:TeleportToPlaceInstance(game.PlaceId, server.id, LocalPlayer)
+                break
+            end
+        end
+    end)
+    task.wait(1)
+    LocalPlayer:Kick("DH HUB: Защитный перезапуск!")
+end
+
+local function CheckPlayer(player)
+    if player == LocalPlayer then return end
+    pcall(function()
+        for _, groupId in pairs(ADMIN_GROUPS) do
+            if player:IsInGroup(groupId) then LeaveServer() return end
+        end
+        local name = player.Name:lower()
+        if name:find("admin") or name:find("mod") or name:find("zioles") or name:find("uzoth") then LeaveServer() end
+    end)
+end
+for _, p in pairs(Players:GetPlayers()) do CheckPlayer(p) end
+Players.PlayerAdded:Connect(CheckPlayer)
+
+-- ====================================================================
+-- ЛОГИКА ФУНКЦИЙ (ФАРМ, ВОЛИ, ВОДЫ)
+-- ====================================================================
+
+-- Функция автоматического включения Воли (Haki)
+task.spawn(function()
+    while true do
+        if _G.AutoHaki then
+            pcall(function()
+                -- Проверяем, включена ли воля (если персонаж не покрылся черным)
+                if LocalPlayer.Character and not LocalPlayer.Character:FindFirstChild("HasBuso") then
+                    -- Отправляем безопасный запрос на сервер для активации Хаки
+                    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Buso")
+                end
+            end)
+        end
+        task.wait(4) -- Проверка каждые 4 секунды
+    end
+end)
+
 local function GetClosestEnemy()
     local Closest = nil
     local MaxDistance = math.huge
@@ -42,7 +99,7 @@ local function GetClosestEnemy()
     return Closest
 end
 
--- ПОТОК ЛЕТАЮЩЕГО ФАРМА
+-- Полет
 task.spawn(function()
     while true do
         if _G.SafeFlyFarm then
@@ -93,21 +150,82 @@ task.spawn(function()
     end
 end)
 
--- ИНТЕРФЕЙС GUI
+-- Обычный кликер
+task.spawn(function()
+    while true do
+        if _G.SafeAttack and not _G.SafeFlyFarm then
+            pcall(function()
+                local character = LocalPlayer.Character
+                if character and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 then
+                    if not character:FindFirstChildOfClass("Tool") then
+                        local tool = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
+                        if tool then character.Humanoid:EquipTool(tool) end
+                    end
+                    VirtualUser:CaptureController()
+                    VirtualUser:ClickButton1(Vector2.new(850, 520))
+                end
+            end)
+        end
+        task.wait(0.15)
+    end
+end)
+
+-- Платформа воды
+local WaterPlatform = Instance.new("Part")
+WaterPlatform.Size = Vector3.new(60, 2, 60)
+WaterPlatform.Transparency = 1 
+WaterPlatform.Anchored = true
+WaterPlatform.CanCollide = false
+WaterPlatform.Parent = workspace
+
+RunService.RenderStepped:Connect(function()
+    pcall(function()
+        local character = LocalPlayer.Character
+        if character and character:FindFirstChild("HumanoidRootPart") and _G.WalkOnWater then
+            local pos = character.HumanoidRootPart.Position
+            if pos.Y <= 25 then 
+                WaterPlatform.CFrame = CFrame.new(pos.X, 11, pos.Z)
+                WaterPlatform.CanCollide = true
+            else
+                WaterPlatform.CanCollide = false
+            end
+        else
+            WaterPlatform.CanCollide = false
+        end
+    end)
+end)
+
+-- Урон воды
+task.spawn(function()
+    while true do
+        pcall(function()
+            for _, v in pairs(workspace:GetDescendants()) do
+                if v.Name == "Water" or v.Name == "Sea" then
+                    if v:IsA("Part") or v:IsA("MeshPart") then v.CanTouch = not _G.NoWaterDamage end
+                end
+            end
+        end)
+        task.wait(3)
+    end
+end)
+
+-- ====================================================================
+-- КРАСИВЫЙ ИНТЕРФЕЙС GUI (В СТИЛЕ REDZ HUB)
+-- ====================================================================
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-if PlayerGui:FindFirstChild("SafeFarmHubV6_1") then PlayerGui.SafeFarmHubV6_1:Destroy() end
+if PlayerGui:FindFirstChild("DH_PremiumHub") then PlayerGui.DH_PremiumHub:Destroy() end
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "SafeFarmHubV6_1"
+ScreenGui.Name = "DH_PremiumHub"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = PlayerGui
 
--- Круглая кнопка DH с темно-красным фоном
+-- Круглая кнопка DH с RGB обводкой
 local MenuBtn = Instance.new("TextButton")
 MenuBtn.Size = UDim2.new(0, 55, 0, 55)
 MenuBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
-MenuBtn.BackgroundColor3 = Color3.fromRGB(130, 0, 0) -- Темно-красный фон
-MenuBtn.Text = "DH" -- Переименовано в DH
+MenuBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+MenuBtn.Text = "DH"
 MenuBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 MenuBtn.Font = Enum.Font.SourceSansBold
 MenuBtn.TextSize = 16
@@ -115,88 +233,10 @@ MenuBtn.Active = true
 MenuBtn.Draggable = true
 MenuBtn.Parent = ScreenGui
 
-local corner1 = Instance.new("UICorner")
-corner1.CornerRadius = UDim.new(1, 0)
-corner1.Parent = MenuBtn
+local c1 = Instance.new("UICorner") c1.CornerRadius = UDim.new(1, 0) c1.Parent = MenuBtn
+local Stroke = Instance.new("UIStroke") Stroke.Thickness = 2.5; Stroke.Parent = MenuBtn
+task.spawn(function() while true do for i = 0, 1, 0.005 do Stroke.Color = Color3.fromHSV(i, 1, 1) task.wait(0.02) end end end)
 
--- Элемент обводки (UIStroke) для создания RGB подсветки вокруг кружка
-local RGBStroke = Instance.new("UIStroke")
-RGBStroke.Thickness = 3 -- Толщина подсветки
-RGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-RGBStroke.Parent = MenuBtn
-
--- Поток для плавной смены цветов радуги (RGB подсветка)
-task.spawn(function()
-    while true do
-        for i = 0, 1, 0.005 do
-            RGBStroke.Color = Color3.fromHSV(i, 1, 1) -- Плавный переход по цветовому спектру
-            task.wait(0.02) -- Скорость переливания радуги
-        end
-    end
-end)
-
--- Главная панель настроек
-local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 210, 0, 110)
-Frame.Position = UDim2.new(0.5, -105, 0.5, -55)
-Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
-Frame.Visible = false
-Frame.Active = true
-Frame.Draggable = true
-Frame.Parent = ScreenGui
-
-local corner2 = Instance.new("UICorner")
-corner2.CornerRadius = UDim.new(0, 10)
-corner2.Parent = Frame
-
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 35)
-Title.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
-Title.Text = "  DELTA HUB v6.1"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.Font = Enum.Font.SourceSansBold
-Title.TextSize = 12
-Title.TextXAlignment = Enum.TextXAlignment.Left
-Title.Parent = Frame
-
-local corner3 = Instance.new("UICorner")
-corner3.CornerRadius = UDim.new(0, 10)
-corner3.Parent = Title
-
-local FarmButton = Instance.new("TextButton")
-FarmButton.Size = UDim2.new(0.9, 0, 0, 45)
-FarmButton.Position = UDim2.new(0.05, 0, 0.48, 0)
-FarmButton.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
-FarmButton.Text = "Фарм летая: ВЫКЛ"
-FarmButton.TextColor3 = Color3.fromRGB(255, 80, 80)
-FarmButton.Font = Enum.Font.SourceSansBold
-FarmButton.TextSize = 14
-FarmButton.Parent = Frame
-
-local corner4 = Instance.new("UICorner")
-corner4.CornerRadius = UDim.new(0, 8)
-corner4.Parent = FarmButton
-
--- ЛОГИКА НАЖАТИЙ
-FarmButton.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        _G.SafeFlyFarm = not _G.SafeFlyFarm
-        if _G.SafeFlyFarm then
-            FarmButton.Text = "Фарм летая: ВКЛ"
-            FarmButton.TextColor3 = Color3.fromRGB(80, 255, 80)
-            FarmButton.BackgroundColor3 = Color3.fromRGB(45, 60, 45)
-        else
-            FarmButton.Text = "Фарм летая: ВЫКЛ"
-            FarmButton.TextColor3 = Color3.fromRGB(255, 80, 80)
-            FarmButton.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
-        end
-    end
-end)
-
-MenuBtn.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        Frame.Visible = not Frame.Visible
-    end
-end)
-
-print("Скрипт v6.1 с RGB подсветкой готов!")
+-- Главное премиум окно в стиле Redz
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 360, 0, 230) -- Широкое окно под вкладки
