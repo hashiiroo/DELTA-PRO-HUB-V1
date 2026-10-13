@@ -1,5 +1,5 @@
 -- ====================================================================
--- DH PRO HUB v10.0: CLEAN BASE (RGB CIRCLE + MONOLITHIC GUI READY)
+-- DH PRO HUB v10.1: CLEAN BASE + RGB CIRCLE + LIGHT TEXT GLOW
 -- ====================================================================
 
 local Players = game:GetService("Players")
@@ -7,7 +7,7 @@ local VirtualUser = game:GetService("VirtualUser")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
--- Автоматический фоновый Anti-AFK (Оставляем для базовой стабильности)
+-- Автоматический фоновый Anti-AFK
 pcall(function()
     LocalPlayer.Idled:Connect(function()
         VirtualUser:CaptureController()
@@ -16,7 +16,7 @@ pcall(function()
 end)
 
 -- ====================================================================
--- СОЗДАНИЕ ИНТЕРФЕЙСА (БАЗОВАЯ ЧИСТАЯ ПАНЕЛЬ)
+-- СОЗДАНИЕ ИНТЕРФЕЙСА
 -- ====================================================================
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 if PlayerGui:FindFirstChild("DH_BaseLayer") then PlayerGui.DH_BaseLayer:Destroy() end
@@ -32,9 +32,9 @@ MenuBtn.Size = UDim2.new(0, 55, 0, 55)
 MenuBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
 MenuBtn.BackgroundColor3 = Color3.fromRGB(130, 0, 0) -- Тёмно-красный
 MenuBtn.Text = "DH"
-MenuBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MenuBtn.TextColor3 = Color3.fromRGB(255, 255, 255) -- Белый цвет букв
 MenuBtn.Font = Enum.Font.SourceSansBold
-MenuBtn.TextSize = 14
+MenuBtn.TextSize = 16
 MenuBtn.Active = true
 MenuBtn.Draggable = true
 MenuBtn.Parent = ScreenGui
@@ -43,7 +43,16 @@ local corner1 = Instance.new("UICorner")
 corner1.CornerRadius = UDim.new(1, 0)
 corner1.Parent = MenuBtn
 
--- ПОДСВЕТКА ВОКРУГ КРУЖКА (RGB-обводка)
+-- 🌟 ДОБАВЛЕНО: ЛЁГКАЯ ПОДСВЕТКА БУКВ ВНУТРИ КРУЖКА
+local TextGlow = Instance.new("UIStroke")
+TextGlow.Thickness = 2 -- Мягкая толщина обводки букв
+TextGlow.Color = Color3.fromRGB(255, 80, 80) -- Светло-красное неоновое свечение
+TextGlow.Transparency = 0.5 -- Полупрозрачность (делает подсветку лёгкой)
+TextGlow.TargetToType = Enum.UIStrokeTargetToType or nil -- Защита от старых версий движка
+TextGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual -- Применяется именно к тексту
+TextGlow.Parent = MenuBtn
+
+-- РАДУЖНАЯ ПОДСВЕТКА ВОКРУГ КРУЖКА (RGB-обводка по краям)
 local RGBStroke = Instance.new("UIStroke")
 RGBStroke.Thickness = 2.5
 RGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
@@ -63,19 +72,19 @@ local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0) -- Строго центр смартфона
-MainFrame.Size = UDim2.new(0, 210, 0, 60) -- Маленький размер под пустую базу
+MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+MainFrame.Size = UDim2.new(0, 210, 0, 60)
 MainFrame.Visible = false
 MainFrame.Active = true
 MainFrame.Draggable = true
 local corner2 = Instance.new("UICorner") corner2.CornerRadius = UDim.new(0, 8) corner2.Parent = MainFrame
 
--- Заголовок меню (Без обводки вокруг букв)
+-- Заголовок меню (Без обводки вокруг букв в самом меню)
 local Title = Instance.new("TextLabel")
 Title.Parent = MainFrame
 Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
-Title.Text = "  DELTA HUB v10.0"
+Title.Text = "  DELTA HUB v10.1"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.SourceSansBold
 Title.TextSize = 13
@@ -102,4 +111,4 @@ MenuBtn.InputBegan:Connect(function(input)
     end
 end)
 
-print("Чистая база скрипта успешно загружена!")
+print("База v10.1 с подсветкой букв загружена!")
