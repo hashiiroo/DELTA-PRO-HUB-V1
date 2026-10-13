@@ -1,12 +1,21 @@
--- DELTA HUB (DH) - BLOX FRUITS SAFE EDITION
-if _G.DeltaHubLoaded then return end
+-- DELTA HUB (DH) - BLOX FRUITS CLEAN & SAFE EDITION
+-- Система самодиагностики и логирования
+print("[DH] Запуск скрипта... Проверка синтаксиса успешна.")
+
+-- Защита от повторного запуска (Anti-Crash)
+if _G.DeltaHubLoaded then 
+    print("[DH] Скрипт уже запущен в этой сессии!")
+    return 
+end
 _G.DeltaHubLoaded = true
 
+-- Основные сервисы игры
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 
+-- Состояние функций
 local autoFarmActive = false
 local currentTarget = nil
 local lastTargetTime = 0
@@ -42,17 +51,18 @@ RGBStroke.Thickness = 3
 RGBStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 RGBStroke.Parent = MenuButton
 
+-- Оптимизированный цикл RGB-подсветки
 task.spawn(function()
     while true do
         for i = 0, 1, 0.005 do
-            if not MenuButton then break end
+            if not MenuButton or not RGBStroke then break end
             RGBStroke.Color = Color3.fromHSV(i, 1, 1)
             task.wait(0.02)
         end
     end
 end)
 
--- ГЛАВНОЕ ОКНО
+-- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 320, 0, 240)
@@ -66,6 +76,7 @@ local FrameCorner = Instance.new("UICorner")
 FrameCorner.CornerRadius = UDim.new(0, 12)
 FrameCorner.Parent = MainFrame
 
+-- Шапка окна
 local Header = Instance.new("Frame")
 Header.Size = UDim2.new(1, 0, 0, 40)
 Header.BackgroundColor3 = Color3.fromRGB(110, 0, 0)
@@ -86,6 +97,7 @@ Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.BackgroundTransparency = 1
 Title.Parent = Header
 
+-- КНОПКА ФАРМА
 local FarmButton = Instance.new("TextButton")
 FarmButton.Size = UDim2.new(0, 280, 0, 50)
 FarmButton.Position = UDim2.new(0.5, -140, 0.35, 0)
@@ -100,11 +112,12 @@ local FarmCorner = Instance.new("UICorner")
 FarmCorner.CornerRadius = UDim.new(0, 8)
 FarmCorner.Parent = FarmButton
 
+-- Текст защиты
 local InfoLabel = Instance.new("TextLabel")
 InfoLabel.Size = UDim2.new(1, 0, 0, 40)
 InfoLabel.Position = UDim2.new(0, 0, 0.7, 0)
 InfoLabel.Text = "Защита: Плавный обход детекции движения,\nрандомизация позиций клика и Anti-Stuck"
-InfoLabel.TextColor3 = Color3.fromRGB(0, 180, 100) -- Зеленый (Безопасно)
+InfoLabel.TextColor3 = Color3.fromRGB(0, 180, 100)
 InfoLabel.TextSize = 12
 InfoLabel.Font = Enum.Font.SourceSansItalic
 InfoLabel.BackgroundTransparency = 1
@@ -144,10 +157,10 @@ MenuButton.InputEnded:Connect(function(input)
 end)
 
 -- ========================================================
--- СИСТЕМА БЕЗОПАСНОСТИ (ANTI-BAN MECHANICS)
+-- ФУНКЦИОНАЛ И СИСТЕМА БЕЗОПАСНОСТИ
 -- ========================================================
 
--- Безопасный Noclip (Прохождение сквозь стены во время полета)
+-- Безопасный Noclip
 RunService.Stepped:Connect(function()
     if autoFarmActive and LocalPlayer.Character then
         for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
@@ -158,14 +171,14 @@ RunService.Stepped:Connect(function()
     end
 end)
 
--- Функция плавного перемещения (Tween) для обхода детектора телепортации
+-- Плавное перемещение (Tween)
 local function safeTween(targetCFrame)
     local character = LocalPlayer.Character
     local rootPart = character and character:FindFirstChild("HumanoidRootPart")
     if not rootPart then return end
 
     local distance = (rootPart.Position - targetCFrame.Position).Magnitude
-    local speed = 250 -- Оптимальная легитная скорость полета
+    local speed = 250
     local duration = distance / speed
 
     local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Linear)
@@ -174,7 +187,7 @@ local function safeTween(targetCFrame)
     return tween
 end
 
--- Автоматическое взятие оружия ближнего боя
+-- Авто-взятие оружия ближнего боя
 local function equipWeapon()
     local character = LocalPlayer.Character
     local backpack = LocalPlayer:FindFirstChild("Backpack")
@@ -189,7 +202,7 @@ local function equipWeapon()
     end
 end
 
--- Поиск ближайшего живого NPC
+-- Поиск моба
 local function getClosestMob()
     local closestMob = nil
     local shortestDistance = 400
@@ -234,26 +247,26 @@ local function toggleAutoFarm(state)
                     local targetMob = getClosestMob()
                     
                     if targetMob and targetMob:FindFirstChild("HumanoidRootPart") then
-                        -- Смена цели или Anti-Stuck проверка (не дольше 5 секунд на одного застрявшего моба)
                         if currentTarget ~= targetMob then
                             currentTarget = targetMob
                             lastTargetTime = tick()
                         elseif tick() - lastTargetTime > 5 then
-                            -- Игнорируем забагованного моба
                             targetMob.Humanoid.Health = 0 
                         end
 
                         equipWeapon()
                         
-                        -- ГЕНЕРАЦИЯ РАНДОМИЗИРОВАННЫХ СМЕЩЕНИЙ (Обход паттернов античита)
+                        -- Рандомизация смещений для обхода античита
                         local randomX = math.random(-8, 8) / 10
                         local randomZ = math.random(-8, 8) / 10
-                        local randomY = math.random(45, 55) / 10 -- Удерживает высоту от 4.5 до 5.5 метров над мобом
+                        local randomY = math.random(45, 55) / 10
                         
                         local targetPos = targetMob.HumanoidRootPart.Position + Vector3.new(randomX, randomY, randomZ)
                         local targetCFrame = CFrame.new(targetPos, targetMob.HumanoidRootPart.Position)
                         
-                        -- Если мы далеко, летим плавно через Tween. Если близко — удерживаем позицию
                         local currentDistance = (rootPart.Position - targetMob.HumanoidRootPart.Position).Magnitude
                         if currentDistance > 30 then
+                            local tween = safeTween(targetCFrame)
+                            if tween then tween.Completed:Wait() end
+                            else
                                 
