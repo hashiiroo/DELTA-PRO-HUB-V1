@@ -1,5 +1,5 @@
 -- ====================================================================
--- DH PREMIUM HUB v7.3: FINAL UNIVERSAL MOBILE FRAME POSITION FIXED
+-- DH PREMIUM HUB v7.4: AUTO-OPEN ON EXECUTE (BYPASS TOUCH BUG)
 -- ====================================================================
 
 _G.SafeFlyFarm = false
@@ -212,7 +212,7 @@ ScreenGui.Name = "DH_PremiumHub"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = PlayerGui
 
--- Круглая кнопка DH
+-- Круглая кнопка DH (теперь служит индикатором работы)
 local MenuBtn = Instance.new("TextButton")
 MenuBtn.Size = UDim2.new(0, 55, 0, 55)
 MenuBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
@@ -229,13 +229,13 @@ local c1 = Instance.new("UICorner") c1.CornerRadius = UDim.new(1, 0) c1.Parent =
 local Stroke = Instance.new("UIStroke") Stroke.Thickness = 2.5; Stroke.Parent = MenuBtn
 task.spawn(function() while true do for i = 0, 1, 0.005 do Stroke.Color = Color3.fromHSV(i, 1, 1) task.wait(0.02) end end end)
 
--- Главная панель в стиле Redz (ИСПРАВЛЕНА ПОЗИЦИЯ ДЛЯ ТЕЛЕФОНОВ)
+-- Главная панель в стиле Redz
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 340, 0, 220)
-MainFrame.AnchorPoint = Vector2.new(0.5, 0.5) -- Точка привязки строго по центру объекта
-MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0) -- Процентное выравнивание ровно посередине экрана телефона
+MainFrame.Size = UDim2.new(0, 340, 0, 240) -- Увеличили высоту под кнопку закрытия
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
-MainFrame.Visible = false
+MainFrame.Visible = true -- ИЗМЕНЕНО: Меню СРАЗУ открыто при старте!
 MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.Parent = ScreenGui
@@ -244,7 +244,7 @@ local c2 = Instance.new("UICorner") c2.CornerRadius = UDim.new(0, 10) c2.Parent 
 
 -- Сайдбар
 local Sidebar = Instance.new("Frame")
-Sidebar.Size = UDim2.new(0, 85, 1, 0)
+Sidebar.Size = UDim2.new(0, 85, 1, -30) -- Оставили место внизу
 Sidebar.BackgroundColor3 = Color3.fromRGB(13, 13, 18)
 Sidebar.Parent = MainFrame
 local c3 = Instance.new("UICorner") c3.CornerRadius = UDim.new(0, 10) c3.Parent = Sidebar
