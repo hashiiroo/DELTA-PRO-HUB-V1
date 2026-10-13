@@ -1,4 +1,4 @@
--- DAIKI HUB - COMPACT EDITION (GUARANTEED FIXED VERSION)
+-- DAIKI HUB - COMPACT EDITION (ABSOLUTE FIX)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -6,7 +6,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local autoFarmActive = false
 
--- Максимально безопасное удаление прошлых сессий
+-- Очистка старых интерфейсов перед запуском
 pcall(function()
     if LocalPlayer.PlayerGui:FindFirstChild("DaikiHubUI") then
         LocalPlayer.PlayerGui.DaikiHubUI:Destroy()
@@ -23,12 +23,12 @@ ScreenGui.ResetOnSpawn = false
 pcall(function() ScreenGui.IgnoreGuiInset = true end)
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- КРУГЛАЯ КНОПКА МЕНЮ (45х45, статичный фон, RGB только на буквах)
+-- КРУГЛАЯ КНОПКА МЕНЮ
 local MenuButton = Instance.new("TextButton")
 MenuButton.Name = "MenuButton"
 MenuButton.Size = UDim2.new(0, 45, 0, 45)
 MenuButton.Position = UDim2.new(0.05, 0, 0.2, 0)
-MenuButton.BackgroundColor3 = Color3.fromRGB(110, 0, 0) -- Тёмно-красный фон
+MenuButton.BackgroundColor3 = Color3.fromRGB(110, 0, 0)
 MenuButton.Text = "DH"
 MenuButton.TextSize = 15
 MenuButton.Font = Enum.Font.SourceSansBold
@@ -39,7 +39,7 @@ local ButtonCorner = Instance.new("UICorner")
 ButtonCorner.CornerRadius = UDim.new(1, 0)
 ButtonCorner.Parent = MenuButton
 
--- Внутренний RGB перелив для текста "DH"
+-- RGB перелив только на буквы "DH"
 task.spawn(function()
     while ScreenGui and ScreenGui.Parent do
         for i = 0, 1, 0.005 do
@@ -50,7 +50,7 @@ task.spawn(function()
     end
 end)
 
--- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА (Размер 320х240)
+-- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 320, 0, 240)
@@ -65,7 +65,7 @@ local FrameCorner = Instance.new("UICorner")
 FrameCorner.CornerRadius = UDim.new(0, 12)
 FrameCorner.Parent = MainFrame
 
--- ШАПКА МЕНЮ (Зона перетаскивания)
+-- ШАПКА МЕНЮ
 local Header = Instance.new("Frame")
 Header.Size = UDim2.new(1, 0, 0, 40)
 Header.BackgroundColor3 = Color3.fromRGB(110, 0, 0)
@@ -77,21 +77,20 @@ local HeaderCorner = Instance.new("UICorner")
 HeaderCorner.CornerRadius = UDim.new(0, 12)
 HeaderCorner.Parent = Header
 
--- ЖЕЛЕЗОБЕТОННЫЙ ЗАГОЛОВОК БЕЗ КОНФЛИКТА КООРДИНАТ
+-- СБЛИЖЕННЫЙ ЗАГОЛОВОК КАПСОМ
 local TitleLabel = Instance.new("TextLabel")
 TitleLabel.Size = UDim2.new(1, -80, 1, 0)
 TitleLabel.Position = UDim2.new(0, 12, 0, 0)
 TitleLabel.BackgroundTransparency = 1
 TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-TitleLabel.TextSize = 14
+TitleLabel.TextSize = 13
 TitleLabel.Font = Enum.Font.SourceSansBold
 TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 TitleLabel.ZIndex = 7
--- Сближение сделано за счет одного текстового поля, что на 100% стабильно на телефонах
-TitleLabel.Text = "DAIKI HUB  |  COMPACT EDITION" 
+TitleLabel.Text = "DAIKI HUB  |  COMPACT EDITION"
 TitleLabel.Parent = Header
 
--- КНОПКА "СКРЫТЬ" (-)
+-- КНОПКА "СКРЫТЬ" (Исправлена синтаксическая ошибка)
 local MinimizeButton = Instance.new("TextButton")
 MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
 MinimizeButton.Position = UDim2.new(1, -65, 0.5, -15)
@@ -103,7 +102,7 @@ MinimizeButton.Font = Enum.Font.SourceSansBold
 MinimizeButton.ZIndex = 7
 MinimizeButton.Parent = Header
 
--- КНОПКА "ЗАКРЫТЬ" (X)
+-- КНОПКА "ЗАКРЫТЬ"
 local CloseButton = Instance.new("TextButton")
 CloseButton.Size = UDim2.new(0, 30, 0, 30)
 CloseButton.Position = UDim2.new(1, -35, 0.5, -15)
@@ -145,7 +144,7 @@ InfoLabel.ZIndex = 6
 InfoLabel.Parent = MainFrame
 
 -- ========================================================
--- СИСТЕМЫ УПРАВЛЕНИЯ
+-- СИСТЕМЫ УПРАВЛЕНИЯ И ИНТЕРФЕЙСА
 -- ========================================================
 
 MenuButton.Activated:Connect(function()
@@ -253,4 +252,6 @@ local function toggleAutoFarm(state)
                     local targetMob = getClosestMob()
                     if targetMob and targetMob:FindFirstChild("HumanoidRootPart") then
                         local backpack = LocalPlayer:FindFirstChild("Backpack")
-                            
+                        if backpack and not character:FindFirstChildOfClass("Tool") then
+                            local combat = backpack:FindFirstChild("Combat") or backpack:FindFirstChildOfClass("Tool")
+                                
