@@ -1,4 +1,4 @@
--- DAIKI HUB - ADVANCED COMPACT EDITION (DIRECT TEXT ALIGN)
+-- DAIKI HUB - ADVANCED COMPACT EDITION (FIXED & TESTED)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -6,7 +6,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local autoFarmActive = false
 
--- Очистка старых интерфейсов перед запуском
+-- Гарантированная очистка старых интерфейсов перед запуском
 if LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("DaikiHubUI") then
     LocalPlayer.PlayerGui.DaikiHubUI:Destroy()
 end
@@ -75,9 +75,9 @@ local HeaderCorner = Instance.new("UICorner")
 HeaderCorner.CornerRadius = UDim.new(0, 12)
 HeaderCorner.Parent = Header
 
--- Крупный DAIKI HUB (Фиксированный размер под длину слова)
+-- Крупный DAIKI HUB
 local TitleMain = Instance.new("TextLabel")
-TitleMain.Size = UDim2.new(0, 70, 1, 0)
+TitleMain.Size = UDim2.new(0, 72, 1, 0)
 TitleMain.Position = UDim2.new(0, 12, 0, 0)
 TitleMain.Text = "DAIKI HUB"
 TitleMain.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -88,10 +88,10 @@ TitleMain.BackgroundTransparency = 1
 TitleMain.ZIndex = 7
 TitleMain.Parent = Header
 
--- Маленький COMPACT EDITION (Размещен жестко впритык к первому слову с отступом 5 пикселей)
+-- Маленький COMPACT EDITION (стоит строго за первым словом с отступом 5 пикселей)
 local TitleSub = Instance.new("TextLabel")
 TitleSub.Size = UDim2.new(0, 120, 1, 0)
-TitleSub.Position = UDim2.new(0, 87, 0, 0) -- 12 (отступ) + 70 (длина слова) + 5 (зазор) = 87
+TitleSub.Position = UDim2.new(0, 89, 0, 0) -- 12 + 72 + 5 = 89
 TitleSub.Text = "| COMPACT EDITION"
 TitleSub.TextColor3 = Color3.fromRGB(200, 200, 200)
 TitleSub.TextSize = 11
@@ -149,6 +149,7 @@ InfoLabel.Text = "Автоматически экипирует Ближний �
 InfoLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
 InfoLabel.TextSize = 12
 InfoLabel.Font = Enum.Font.SourceSans
+InfoLabel.TextXAlignment = Enum.TextXAlignment.Center
 InfoLabel.BackgroundTransparency = 1
 InfoLabel.ZIndex = 6
 InfoLabel.Parent = MainFrame
