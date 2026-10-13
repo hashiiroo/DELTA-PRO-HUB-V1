@@ -1,4 +1,4 @@
--- DAIKI HUB - ADVANCED COMPACT EDITION (RICH TEXT FIX)
+-- DAIKI HUB - ADVANCED COMPACT EDITION (TOTAL FIX)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -6,7 +6,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local autoFarmActive = false
 
--- Полная очистка старых UI перед запуском
+-- Гарантированная очистка старых интерфейсов перед запуском
 if LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("DaikiHubUI") then
     LocalPlayer.PlayerGui.DaikiHubUI:Destroy()
 end
@@ -48,7 +48,7 @@ task.spawn(function()
     end
 end)
 
--- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА
+-- ГЛАВНОЕ ОКНО ИНТЕРФЕЙСА (Фиксированный стабильный размер)
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 320, 0, 240)
@@ -79,11 +79,11 @@ HeaderCorner.Parent = Header
 local TitleLabel = Instance.new("TextLabel")
 TitleLabel.Size = UDim2.new(1, -80, 1, 0)
 TitleLabel.Position = UDim2.new(0, 12, 0, 0)
-TitleLabel.BackgroundTransparency = 1 -- Защита от белого фона
+TitleLabel.BackgroundTransparency = 1
 TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
 TitleLabel.ZIndex = 7
-TitleLabel.RichText = true -- Позволяет настраивать размер внутри строки
+TitleLabel.RichText = true
 TitleLabel.Text = '<b>DAIKI HUB</b> <font size="11" color="rgb(200,200,200)">| COMPACT EDITION</font>'
 TitleLabel.Parent = Header
 
@@ -124,8 +124,7 @@ FarmButton.ZIndex = 6
 FarmButton.Parent = MainFrame
 
 local FarmCorner = Instance.new("UICorner")
-FarmCorner.CornerRadius = UDim.new(0, 8)
-FarmCorner.Parent = FarmButton
+FrameCorner:Clone().Parent = FarmButton -- Копируем закругление для стабильности
 
 -- ТЕКСТ ОПИСАНИЯ
 local InfoLabel = Instance.new("TextLabel")
@@ -139,22 +138,6 @@ InfoLabel.TextXAlignment = Enum.TextXAlignment.Center
 InfoLabel.BackgroundTransparency = 1
 InfoLabel.ZIndex = 6
 InfoLabel.Parent = MainFrame
-
--- РЕКУЛЯТОР РАЗМЕРА МЕНЮ
-local ResizeButton = Instance.new("TextButton")
-ResizeButton.Name = "ResizeButton"
-ResizeButton.Size = UDim2.new(0, 16, 0, 16)
-ResizeButton.Position = UDim2.new(1, -16, 1, -16)
-ResizeButton.BackgroundColor3 = Color3.fromRGB(110, 0, 0)
-ResizeButton.Text = "◢"
-ResizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ResizeButton.TextSize = 10
-ResizeButton.ZIndex = 8
-ResizeButton.Parent = MainFrame
-
-local ResizeCorner = Instance.new("UICorner")
-ResizeCorner.CornerRadius = UDim.new(0, 4)
-ResizeCorner.Parent = ResizeButton
 
 -- ========================================================
 -- СИСТЕМЫ УПРАВЛЕНИЯ И ИНТЕРФЕЙСА
@@ -213,30 +196,6 @@ Header.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragFrameActive = false end
 end)
 
--- Изменение размера окна
-local resizing = false
-local resizeStartPos, resizeStartSize
-ResizeButton.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        resizing = true; resizeStartPos = input.Position; resizeStartSize = MainFrame.Size
-    end
-end)
-UserInputService.InputChanged:Connect(function(input)
-    if resizing and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - resizeStartPos
-        local newX = math.max(260, resizeStartSize.X.Offset + delta.X)
-        local newY = math.max(180, resizeStartSize.Y.Offset + delta.Y)
-        
-        MainFrame.Size = UDim2.new(0, newX, 0, newY)
-        FarmButton.Size = UDim2.new(0, newX - 40, 0, 50)
-        FarmButton.Position = UDim2.new(0.5, -(newX - 40)/2, 0.35, 0)
-        InfoLabel.Position = UDim2.new(0, 0, 0.65, 0)
-    end
-end)
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then resizing = false end
-end)
-
 -- ========================================================
 -- ФУНКЦИОНАЛ ФАРМА
 -- ========================================================
@@ -255,5 +214,40 @@ local function getClosestMob()
     local character = LocalPlayer.Character
     local rootPart = character and character:FindFirstChild("HumanoidRootPart")
     if not rootPart then return nil end
-
     
+    local enemiesFolder = workspace:FindFirstChild("Enemies") or workspace
+    
+    for _, object in pairs(enemiesFolder:GetChildren()) do
+        if object:IsA("Model") and object:FindFirstChild("Humanoid") and object ~= character then
+            local enemyRoot = object:FindFirstChild("HumanoidRootPart")
+            local enemyHumanoid = object:FindFirstChild("Humanoid")
+            
+            if enemyRoot and enemyHumanoid and enemyHumanoid.Health > 0 then
+                local distance = (rootPart.Position - enemyRoot.Position).Magnitude
+                if distance < shortestDistance then
+                    shortestDistance = distance; closestMob = object
+                end
+            end
+        end
+    end
+    return closestMob
+end
+
+local function toggleAutoFarm(state)
+    autoFarmActive = state
+    if autoFarmActive then
+        FarmButton.Text = "Автофарм Ближайших Мобов: ВКЛ"
+        FarmButton.BackgroundColor3 = Color3.fromRGB(110, 0, 0)
+        FarmButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        
+        task.spawn(function()
+            while autoFarmActive do
+                local character = LocalPlayer.Character
+                local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+                if rootPart then
+                    local targetMob = getClosestMob()
+                    if targetMob and targetMob:FindFirstChild("HumanoidRootPart") then
+                        local backpack = LocalPlayer:FindFirstChild("Backpack")
+                        if backpack and not character:FindFirstChildOfClass("Tool") then
+                            local combat = backpack:FindFirstChild("Combat") or backpack:FindFirstChildOfClass("Tool")
+                                
