@@ -1,441 +1,254 @@
+-- ====================================================================
+-- DH PREMIEM HUB v9.0: REDZ UPDATE CARD STYLE & SAFE FLY FARM
+-- ====================================================================
+
+_G.SafeFlyFarm = false
+_G.SafeAttack = false
+_G.AutoHaki = false
+_G.WalkOnWater = false
+_G.NoWaterDamage = false
+
 local Players = game:GetService("Players")
+local VirtualUser = game:GetService("VirtualUser")
+local RunService = game:GetService("RunService")
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
 local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
 
-local player = Players.LocalPlayer
+local FarmSpeed = 75
+local ADMIN_GROUPS = { 4342932, 1200769 }
 
---==================================================
--- CONFIG
---==================================================
+-- ANTI-AFK
+pcall(function()
+    LocalPlayer.Idled:Connect(function()
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new(0, 0))
+    end)
+end)
 
--- Main Olive Theme
-local ACCENT = Color3.fromRGB(145, 155, 55)
+-- ANTI-ADMIN
+local function LeaveServer()
+    _G.SafeFlyFarm = false
+    _G.SafeAttack = false
+    pcall(function()
+        local url = "https://roblox.com" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
+        local servers = HttpService:JSONDecode(game:HttpGet(url))
+        for _, server in pairs(servers.data) do
+            if server.playing < server.maxPlayers and server.id ~= game.JobId then
+                TeleportService:TeleportToPlaceInstance(game.PlaceId, server.id, LocalPlayer)
+                break
+            end
+        end
+    end)
+    task.wait(1)
+    LocalPlayer:Kick("DH HUB: Защитный перезапуск!")
+end
 
--- Copied / Success Color
-local COPIED_COLOR = Color3.fromRGB(225, 135, 45)
+local function CheckPlayer(player)
+    if player == LocalPlayer then return end
+    pcall(function()
+        for _, groupId in pairs(ADMIN_GROUPS) do
+            if player:IsInGroup(groupId) then LeaveServer() return end
+        end
+        local name = player.Name:lower()
+        if name:find("admin") or name:find("mod") or name:find("zioles") or name:find("uzoth") then LeaveServer() end
+    end)
+end
+for _, p in pairs(Players:GetPlayers()) do CheckPlayer(p) end
+Players.PlayerAdded:Connect(CheckPlayer)
 
--- Your script / loader link
-local SCRIPT_LINK = "https://discord.gg/pKS6qzcaqB"
+-- АВТО-ХАКИ
+task.spawn(function()
+    while true do
+        if _G.AutoHaki then
+            pcall(function()
+                if LocalPlayer.Character and not LocalPlayer.Character:FindFirstChild("HasBuso") then
+                    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Buso")
+                end
+            end)
+        end
+        task.wait(4)
+    end
+end)
 
---==================================================
--- SCREEN GUI
---==================================================
+-- ПОИСК БОТОВ
+local function GetClosestEnemy()
+    local Closest = nil
+    local MaxDistance = math.huge
+    local character = LocalPlayer.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local targetsFolder = workspace:FindFirstChild("Enemies") or workspace
+        for _, enemy in pairs(targetsFolder:GetChildren()) do
+            if enemy:IsA("Model") and enemy:FindFirstChild("HumanoidRootPart") and enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+                if enemy.Name ~= LocalPlayer.Name then
+                    local distance = (enemy.HumanoidRootPart.Position - character.HumanoidRootPart.Position).Magnitude
+                    if distance < MaxDistance and distance < 250 then
+                        MaxDistance = distance
+                        Closest = enemy
+                    end
+                end
+            end
+        end
+    end
+    return Closest
+end
 
-local gui = Instance.new("ScreenGui")
-gui.Name = "HubUpdate"
-gui.ResetOnSpawn = false
-gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-gui.Parent = player:WaitForChild("PlayerGui")
+-- ПОТОК ПОЛЕТА
+task.spawn(function()
+    while true do
+        if _G.SafeFlyFarm then
+            pcall(function()
+                local character = LocalPlayer.Character
+                if character and character:FindFirstChild("HumanoidRootPart") and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 then
+                    local targetEnemy = GetClosestEnemy()
+                    if targetEnemy then
+                        if not character.HumanoidRootPart:FindFirstChild("FarmVelocity") then
+                            local bv = Instance.new("BodyVelocity")
+                            bv.Name = "FarmVelocity"
+                            bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+                            bv.Velocity = Vector3.new(0, 0, 0)
+                            bv.Parent = character.HumanoidRootPart
+                        end
+                        local targetPos = targetEnemy.HumanoidRootPart.Position + Vector3.new(0, 6, 0)
+                        local distance = (targetPos - character.HumanoidRootPart.Position).Magnitude
+                        if distance > 2 then
+                            character.HumanoidRootPart.FarmVelocity.Velocity = (targetPos - character.HumanoidRootPart.Position).Unit * FarmSpeed
+                        else
+                            character.HumanoidRootPart.FarmVelocity.Velocity = Vector3.new(0, 0, 0)
+                        end
+                        character.HumanoidRootPart.CFrame = CFrame.new(character.HumanoidRootPart.Position, targetEnemy.HumanoidRootPart.Position)
+                        if not character:FindFirstChildOfClass("Tool") then
+                            local tool = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
+                            if tool then character.Humanoid:EquipTool(tool) end
+                        end
+                        VirtualUser:CaptureController()
+                        VirtualUser:ClickButton1(Vector2.new(850, 520))
+                    else
+                        if character.HumanoidRootPart:FindFirstChild("FarmVelocity") then
+                            character.HumanoidRootPart.FarmVelocity.Velocity = Vector3.new(0, 0, 0)
+                        end
+                    end
+                end
+            end)
+        else
+            pcall(function()
+                local character = LocalPlayer.Character
+                if character and character:FindFirstChild("HumanoidRootPart") then
+                    if character.HumanoidRootPart:FindFirstChild("FarmVelocity") then
+                        character.HumanoidRootPart.FarmVelocity:Destroy()
+                    end
+                end
+            end)
+        end
+        task.wait(0.05)
+    end
+end)
 
---==================================================
--- MAIN CARD
---==================================================
+-- ОБЫЧНЫЙ КЛИКЕР
+task.spawn(function()
+    while true do
+        if _G.SafeAttack and not _G.SafeFlyFarm then
+            pcall(function()
+                local character = LocalPlayer.Character
+                if character and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 then
+                    if not character:FindFirstChildOfClass("Tool") then
+                        local tool = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
+                        if tool then character.Humanoid:EquipTool(tool) end
+                    end
+                    VirtualUser:CaptureController()
+                    VirtualUser:ClickButton1(Vector2.new(850, 520))
+                end
+            end)
+        end
+        task.wait(0.15)
+    end
+end)
 
-local frame = Instance.new("Frame")
+-- ВОДНАЯ ПЛАТФОРМА
+local WaterPlatform = Instance.new("Part")
+WaterPlatform.Size = Vector3.new(60, 2, 60)
+WaterPlatform.Transparency = 1 
+WaterPlatform.Anchored = true
+WaterPlatform.CanCollide = false
+WaterPlatform.Parent = workspace
 
-frame.Size = UDim2.fromOffset(380, 235)
+RunService.RenderStepped:Connect(function()
+    pcall(function()
+        local character = LocalPlayer.Character
+        if character and character:FindFirstChild("HumanoidRootPart") and _G.WalkOnWater then
+            local pos = character.HumanoidRootPart.Position
+            if pos.Y <= 25 then 
+                WaterPlatform.CFrame = CFrame.new(pos.X, 11, pos.Z)
+                WaterPlatform.CanCollide = true
+            else
+                WaterPlatform.CanCollide = false
+            end
+        else
+            WaterPlatform.CanCollide = false
+        end
+    end)
+end)
 
--- Start slightly below center
-frame.Position = UDim2.new(0.5, 0, 0.5, 40)
+-- УРОН ВОДЫ
+task.spawn(function()
+    while true do
+        pcall(function()
+            for _, v in pairs(workspace:GetDescendants()) do
+                if v.Name == "Water" or v.Name == "Sea" then
+                    if v:IsA("Part") or v:IsA("MeshPart") then v.CanTouch = not _G.NoWaterDamage end
+                end
+            end
+        end)
+        task.wait(3)
+    end
+end)
 
-frame.AnchorPoint = Vector2.new(0.5, 0.5)
+-- ====================================================================
+-- ИНТЕРФЕЙС В ПРЕМИУМ-СТИЛЕ REDZ UPDATE CARD
+-- ====================================================================
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+if PlayerGui:FindFirstChild("DH_PremiumCard") then PlayerGui.DH_PremiumCard:Destroy() end
 
-frame.BackgroundColor3 = Color3.fromRGB(16, 16, 21)
-frame.BorderSizePixel = 0
-frame.ClipsDescendants = true
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DH_PremiumCard"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
 
-frame.Parent = gui
+-- Круглая плавающая кнопка DH с RGB-подсветкой
+local MenuBtn = Instance.new("TextButton")
+MenuBtn.Size = UDim2.new(0, 55, 0, 55)
+MenuBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
+MenuBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+MenuBtn.Text = "DH"
+MenuBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MenuBtn.Font = Enum.Font.SourceSansBold
+MenuBtn.TextSize = 16
+MenuBtn.Active = true
+MenuBtn.Draggable = true
+MenuBtn.Parent = ScreenGui
 
---==================================================
--- ROUNDED CORNERS
---==================================================
+local c1 = Instance.new("UICorner") c1.CornerRadius = UDim.new(1, 0) c1.Parent = MenuBtn
+local Stroke = Instance.new("UIStroke") Stroke.Thickness = 2.5; Stroke.Parent = MenuBtn
+task.spawn(function() while true do for i = 0, 1, 0.005 do Stroke.Color = Color3.fromHSV(i, 1, 1) task.wait(0.02) end end end)
 
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 16)
-corner.Parent = frame
+-- Главная карточка (Стиль Redz Update Card)
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.fromOffset(360, 240)
+MainFrame.Position = UDim2.new(0.5, -180, 0.5, -120)
+MainFrame.BackgroundColor3 = Color3.fromRGB(16, 16, 21)
+MainFrame.BorderSizePixel = 0
+MainFrame.Visible = false
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
 
---==================================================
--- BACKGROUND GRADIENT
---==================================================
+local c2 = Instance.new("UICorner") c2.CornerRadius = UDim.new(0, 16) c2.Parent = MainFrame
 
+-- Градиент на фоне
 local gradient = Instance.new("UIGradient")
-
 gradient.Color = ColorSequence.new({
-
-	ColorSequenceKeypoint.new(
-		0,
-		Color3.fromRGB(30, 31, 25)
-	),
-
-	ColorSequenceKeypoint.new(
-		0.5,
-		Color3.fromRGB(19, 20, 17)
-	),
-
-	ColorSequenceKeypoint.new(
-		1,
-		Color3.fromRGB(10, 11, 9)
-	)
-
-})
-
-gradient.Rotation = 135
-gradient.Parent = frame
-
---==================================================
--- BORDER
---==================================================
-
-local stroke = Instance.new("UIStroke")
-
-stroke.Color = ACCENT
-stroke.Transparency = 0.55
-stroke.Thickness = 1.2
-
-stroke.Parent = frame
-
---==================================================
--- TOP ACCENT LINE
---==================================================
-
-local topLine = Instance.new("Frame")
-
-topLine.Size = UDim2.new(0.55, 0, 0, 3)
-topLine.Position = UDim2.new(0.225, 0, 0, 0)
-
-topLine.BackgroundColor3 = ACCENT
-topLine.BorderSizePixel = 0
-
-topLine.Parent = frame
-
-local topCorner = Instance.new("UICorner")
-topCorner.CornerRadius = UDim.new(1, 0)
-topCorner.Parent = topLine
-
---==================================================
--- SUBTLE TOP GLOW
---==================================================
-
-local glow = Instance.new("Frame")
-
-glow.Size = UDim2.fromOffset(220, 120)
-glow.Position = UDim2.new(0.5, -110, 0, -75)
-
-glow.BackgroundColor3 = ACCENT
-glow.BackgroundTransparency = 0.94
-glow.BorderSizePixel = 0
-
-glow.ZIndex = 1
-glow.Parent = frame
-
-local glowCorner = Instance.new("UICorner")
-glowCorner.CornerRadius = UDim.new(1, 0)
-glowCorner.Parent = glow
-
---==================================================
--- UPDATE ICON
---==================================================
-
-local icon = Instance.new("Frame")
-
-icon.Size = UDim2.fromOffset(42, 42)
-icon.Position = UDim2.new(0, 20, 0, 22)
-
-icon.BackgroundColor3 = ACCENT
-icon.BackgroundTransparency = 0.88
-icon.BorderSizePixel = 0
-
-icon.ZIndex = 3
-icon.Parent = frame
-
-local iconCorner = Instance.new("UICorner")
-iconCorner.CornerRadius = UDim.new(0, 12)
-iconCorner.Parent = icon
-
-local iconStroke = Instance.new("UIStroke")
-
-iconStroke.Color = ACCENT
-iconStroke.Transparency = 0.55
-iconStroke.Thickness = 1
-
-iconStroke.Parent = icon
-
-local iconText = Instance.new("TextLabel")
-
-iconText.Size = UDim2.fromScale(1, 1)
-iconText.BackgroundTransparency = 1
-
-iconText.Text = "↑"
-iconText.TextColor3 = ACCENT
-iconText.TextSize = 25
-iconText.Font = Enum.Font.GothamBold
-
-iconText.ZIndex = 4
-iconText.Parent = icon
-
---==================================================
--- TITLE
---==================================================
-
-local title = Instance.new("TextLabel")
-
-title.Size = UDim2.new(1, -115, 0, 30)
-title.Position = UDim2.new(0, 75, 0, 20)
-
-title.BackgroundTransparency = 1
-title.Text = "SCRIPT UPDATE"
-
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextSize = 21
-title.TextXAlignment = Enum.TextXAlignment.Left
-title.Font = Enum.Font.GothamBold
-
-title.ZIndex = 3
-title.Parent = frame
-
---==================================================
--- VERSION LABEL
---==================================================
-
-local version = Instance.new("TextLabel")
-
-version.Size = UDim2.new(1, -115, 0, 18)
-version.Position = UDim2.new(0, 76, 0, 47)
-
-version.BackgroundTransparency = 1
-version.Text = "NEW VERSION AVAILABLE"
-
-version.TextColor3 = ACCENT
-version.TextSize = 10
-version.TextXAlignment = Enum.TextXAlignment.Left
-version.Font = Enum.Font.GothamBold
-
-version.ZIndex = 3
-version.Parent = frame
-
---==================================================
--- CLOSE BUTTON
---==================================================
-
-local close = Instance.new("TextButton")
-
-close.Size = UDim2.fromOffset(32, 32)
-close.Position = UDim2.new(1, -42, 0, 14)
-
-close.BackgroundTransparency = 1
-close.Text = "×"
-
-close.TextColor3 = Color3.fromRGB(130, 130, 140)
-close.TextSize = 24
-close.Font = Enum.Font.Gotham
-
-close.AutoButtonColor = false
-
-close.ZIndex = 5
-close.Parent = frame
-
--- Close hover
-close.MouseEnter:Connect(function()
-
-	TweenService:Create(
-		close,
-		TweenInfo.new(0.15),
-		{
-			TextColor3 = ACCENT
-		}
-	):Play()
-
-end)
-
-close.MouseLeave:Connect(function()
-
-	TweenService:Create(
-		close,
-		TweenInfo.new(0.15),
-		{
-			TextColor3 = Color3.fromRGB(130, 130, 140)
-		}
-	):Play()
-
-end)
-
---==================================================
--- DESCRIPTION
---==================================================
-
-local subtitle = Instance.new("TextLabel")
-
-subtitle.Size = UDim2.new(1, -40, 0, 25)
-subtitle.Position = UDim2.new(0, 20, 0, 78)
-
-subtitle.BackgroundTransparency = 1
-subtitle.Text = "A new script or loader is available."
-
-subtitle.TextColor3 = Color3.fromRGB(235, 235, 240)
-subtitle.TextSize = 14
-subtitle.TextXAlignment = Enum.TextXAlignment.Left
-subtitle.Font = Enum.Font.GothamMedium
-
-subtitle.ZIndex = 3
-subtitle.Parent = frame
-
---==================================================
--- DESCRIPTION 2
---==================================================
-
-local description = Instance.new("TextLabel")
-
-description.Size = UDim2.new(1, -40, 0, 25)
-description.Position = UDim2.new(0, 20, 0, 99)
-
-description.BackgroundTransparency = 1
-description.Text = "Copy the link below and open it in your browser."
-
-description.TextColor3 = Color3.fromRGB(135, 135, 145)
-description.TextSize = 12
-description.TextXAlignment = Enum.TextXAlignment.Left
-description.Font = Enum.Font.Gotham
-
-description.ZIndex = 3
-description.Parent = frame
-
---==================================================
--- COPY BUTTON
---==================================================
-
-local button = Instance.new("TextButton")
-
-button.Size = UDim2.new(1, -40, 0, 48)
-button.Position = UDim2.new(0, 20, 0, 145)
-
-button.BackgroundColor3 = ACCENT
-button.BorderSizePixel = 0
-
-button.AutoButtonColor = false
-button.Text = ""
-
-button.ZIndex = 3
-button.Parent = frame
-
--- Rounded button
-local buttonCorner = Instance.new("UICorner")
-buttonCorner.CornerRadius = UDim.new(0, 10)
-buttonCorner.Parent = button
-
---==================================================
--- BUTTON GRADIENT
---==================================================
-
-local buttonGradient = Instance.new("UIGradient")
-
-buttonGradient.Color = ColorSequence.new({
-
-	ColorSequenceKeypoint.new(
-		0,
-		ACCENT
-	),
-
-	ColorSequenceKeypoint.new(
-		1,
-		ACCENT:Lerp(
-			Color3.fromRGB(255, 255, 255),
-			0.08
-		)
-	)
-
-})
-
-buttonGradient.Rotation = 90
-buttonGradient.Parent = button
-
---==================================================
--- BUTTON BORDER
---==================================================
-
-local buttonStroke = Instance.new("UIStroke")
-
-buttonStroke.Color = Color3.fromRGB(255, 255, 255)
-buttonStroke.Transparency = 0.82
-buttonStroke.Thickness = 1
-
-buttonStroke.Parent = button
-
---==================================================
--- BUTTON TEXT
---==================================================
-
-local buttonText = Instance.new("TextLabel")
-
--- Full button size so text is perfectly centered
-buttonText.Size = UDim2.fromScale(1, 1)
-buttonText.Position = UDim2.fromScale(0, 0)
-
-buttonText.BackgroundTransparency = 1
-
-buttonText.Text = "COPY LINK SCRIPT"
-
-buttonText.TextColor3 = Color3.fromRGB(255, 255, 255)
-buttonText.TextSize = 13
-
-buttonText.TextXAlignment = Enum.TextXAlignment.Center
-buttonText.TextYAlignment = Enum.TextYAlignment.Center
-
-buttonText.Font = Enum.Font.GothamBold
-
-buttonText.ZIndex = 4
-buttonText.Parent = button
-
---==================================================
--- BOTTOM INFO
---==================================================
-
-local info = Instance.new("TextLabel")
-
-info.Size = UDim2.new(1, -40, 0, 20)
-info.Position = UDim2.new(0, 20, 1, -27)
-
-info.BackgroundTransparency = 1
-
-info.Text = "Make sure you are using the latest version from scriptpastebin.com."
-
-info.TextColor3 = Color3.fromRGB(135, 135, 145)
-info.TextSize = 10
-
-info.Font = Enum.Font.Gotham
-info.TextXAlignment = Enum.TextXAlignment.Center
-
-info.ZIndex = 3
-info.Parent = frame
-
---==================================================
--- BUTTON HOVER
---==================================================
-
-local originalSize = button.Size
-local originalPosition = button.Position
-
-button.MouseEnter:Connect(function()
-
-	TweenService:Create(
-		button,
-		TweenInfo.new(
-			0.18,
-			Enum.EasingStyle.Quad,
-			Enum.EasingDirection.Out
-		),
-		{
-			BackgroundColor3 =
-				ACCENT:Lerp(
-					Color3.fromRGB(255, 255, 255),
-					0.10
-				),
-
-			Size = UDim2.new(1, -36, 0, 50),
-			Position = UDim2.new(0, 18, 0, 144)
-		}
-	):Play()
-
-	TweenService:Create(
-		buttonStroke,
+oke,
 		TweenInfo.new(0.18),
 		{
 			Transparency = 0.55
