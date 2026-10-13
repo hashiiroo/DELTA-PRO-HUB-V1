@@ -1,5 +1,5 @@
 -- ====================================================================
--- DH PREMIUM HUB v7.2: FULLY FIXED SYNTAX & MOBILE TOUCH EVENTS
+-- DH PREMIUM HUB v7.3: FINAL UNIVERSAL MOBILE FRAME POSITION FIXED
 -- ====================================================================
 
 _G.SafeFlyFarm = false
@@ -79,7 +79,6 @@ local function GetClosestEnemy()
     if character and character:FindFirstChild("HumanoidRootPart") then
         local targetsFolder = workspace:FindFirstChild("Enemies") or workspace
         for _, enemy in pairs(targetsFolder:GetChildren()) do
-            -- ИСПРАВЛЕНО: Восстановлен правильный синтаксис Health > 0
             if enemy:IsA("Model") and enemy:FindFirstChild("HumanoidRootPart") and enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
                 if enemy.Name ~= LocalPlayer.Name then
                     local distance = (enemy.HumanoidRootPart.Position - character.HumanoidRootPart.Position).Magnitude
@@ -100,7 +99,6 @@ task.spawn(function()
         if _G.SafeFlyFarm then
             pcall(function()
                 local character = LocalPlayer.Character
-                -- ИСПРАВЛЕНО: Восстановлен правильный синтаксис Health > 0
                 if character and character:FindFirstChild("HumanoidRootPart") and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 then
                     local targetEnemy = GetClosestEnemy()
                     if targetEnemy then
@@ -152,7 +150,6 @@ task.spawn(function()
         if _G.SafeAttack and not _G.SafeFlyFarm then
             pcall(function()
                 local character = LocalPlayer.Character
-                -- ИСПРАВЛЕНО: Восстановлен правильный синтаксис Health > 0
                 if character and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 then
                     if not character:FindFirstChildOfClass("Tool") then
                         local tool = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
@@ -232,10 +229,11 @@ local c1 = Instance.new("UICorner") c1.CornerRadius = UDim.new(1, 0) c1.Parent =
 local Stroke = Instance.new("UIStroke") Stroke.Thickness = 2.5; Stroke.Parent = MenuBtn
 task.spawn(function() while true do for i = 0, 1, 0.005 do Stroke.Color = Color3.fromHSV(i, 1, 1) task.wait(0.02) end end end)
 
--- Главная панель в стиле Redz
+-- Главная панель в стиле Redz (ИСПРАВЛЕНА ПОЗИЦИЯ ДЛЯ ТЕЛЕФОНОВ)
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 360, 0, 230)
-MainFrame.Position = UDim2.new(0.5, -180, 0.5, -115)
+MainFrame.Size = UDim2.new(0, 340, 0, 220)
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5) -- Точка привязки строго по центру объекта
+MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0) -- Процентное выравнивание ровно посередине экрана телефона
 MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
 MainFrame.Visible = false
 MainFrame.Active = true
@@ -246,6 +244,8 @@ local c2 = Instance.new("UICorner") c2.CornerRadius = UDim.new(0, 10) c2.Parent 
 
 -- Сайдбар
 local Sidebar = Instance.new("Frame")
-Sidebar.Size = UDim2.new(0, 90, 1, 0)
+Sidebar.Size = UDim2.new(0, 85, 1, 0)
 Sidebar.BackgroundColor3 = Color3.fromRGB(13, 13, 18)
 Sidebar.Parent = MainFrame
+local c3 = Instance.new("UICorner") c3.CornerRadius = UDim.new(0, 10) c3.Parent = Sidebar
+
