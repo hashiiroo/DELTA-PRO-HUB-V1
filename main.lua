@@ -1,1 +1,249 @@
-local a=game:GetService("Players")local b=game:GetService("VirtualUser")local c=game:GetService("HttpService")local d=game:GetService("TeleportService")local e=game:GetService("RunService")local f=a.LocalPlayer local function g()_G.SafeAttack=false;_G.FlyBotFarm=false;pcall(function()local h="https://roblox.com"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"local j=c:JSONDecode(game:HttpGet(h))for k,v in pairs(j.data)do if v.playing<v.maxPlayers and v.id~=game.JobId then d:TeleportToPlaceInstance(game.PlaceId,v.id,f)break end end end)task.wait(1)f:Kick()end;local function l(m)if m==f then return end;pcall(function()if m:IsInGroup(4342932)or m:IsInGroup(1200769)then g()end;local n=m.Name:lower()if n:find("admin")or n:find("mod")or n:find("zioles")or n:find("uzoth")then g()end end)end;for k,p in pairs(a:GetPlayers())do l(p)end;a.PlayerAdded:Connect(l)pcall(function()f.Idled:Connect(function()b:CaptureController()b:ClickButton2(Vector2.new(0,0))end)end)local o=Instance.new("Part")o.Size=Vector3.new(50,2,50)o.Transparency=1;o.Anchored=true;o.CanCollide=false;o.Parent=workspace;e.RenderStepped:Connect(function()pcall(function()local q=f.Character;if q and q:FindFirstChild("HumanoidRootPart")and _G.WalkOnWater then local r=q.HumanoidRootPart.Position;if r.Y<=25 then o.CFrame=CFrame.new(r.X,11,r.Z)o.CanCollide=true else o.CanCollide=false end else o.CanCollide=false end end)end)task.spawn(function()while true do pcall(function()for k,v in pairs(workspace:GetDescendants())do if v.Name=="Water" or v.Name=="Sea" then if v:IsA("Part")or v:IsA("MeshPart")then v.CanTouch=not _G.NoWaterDamage end end end end)task.wait(3)end end)local function s()local t=nil;local u=math.huge;local q=f.Character;if q and q:FindFirstChild("HumanoidRootPart")then local w=workspace:FindFirstChild("Enemies") or workspace;for k,e in pairs(w:GetChildren())do if e:IsA("Model")and e:FindFirstChild("HumanoidRootPart")and e:FindFirstChild("Humanoid")and e.Humanoid.Health > 0 then if e.Name~=f.Name then local x=(e.HumanoidRootPart.Position-q.HumanoidRootPart.Position).Magnitude;if x<u and x<250 then u=x;t=e end end end end end;return t end;task.spawn(function()while true do if _G.FlyBotFarm then pcall(function()local q=f.Character;if q and q:FindFirstChild("HumanoidRootPart")and q:FindFirstChild("Humanoid")and q.Humanoid.Health > 0 then local y=s()if y then if not q.HumanoidRootPart:FindFirstChild("BF_Velocity") then local z=Instance.new("BodyVelocity")z.Name="BF_Velocity"z.MaxForce=Vector3.new(9e9,9e9,9e9)z.Velocity=Vector3.new(0,0,0)z.Parent=q.HumanoidRootPart end;local A=y.HumanoidRootPart.Position+Vector3.new(0,6,0)local x=(A-q.HumanoidRootPart.Position).Magnitude;if x > 2 then q.HumanoidRootPart.BF_Velocity.Velocity=(A-q.HumanoidRootPart.Position).Unit*80 else q.HumanoidRootPart.BF_Velocity.Velocity=Vector3.new(0,0,0)end;q.HumanoidRootPart.CFrame=CFrame.new(q.HumanoidRootPart.Position,y.HumanoidRootPart.Position)if not q:FindFirstChildOfClass("Tool")then local B=f.Backpack:FindFirstChildOfClass("Tool")if B then q.Humanoid:EquipTool(B)end end;b:CaptureController()b:ClickButton1(Vector2.new(850,520))else if q.HumanoidRootPart:FindFirstChild("BF_Velocity")then q.HumanoidRootPart.BF_Velocity.Velocity=Vector3.new(0,0,0)end end end end)else pcall(function()local q=f.Character;if q and q:FindFirstChild("HumanoidRootPart")then if q.HumanoidRootPart:FindFirstChild("BF_Velocity")then q.HumanoidRootPart.BF_Velocity:Destroy()end end end)end;task.wait(0.05)end end)task.spawn(function()while true do if _G.SafeAttack and not _G.FlyBotFarm then pcall(function()local q=f.Character;if q and q:FindFirstChild("Humanoid")and q.Humanoid.Health > 0 then if not q:FindFirstChildOfClass("Tool")then local B=f.Backpack:FindFirstChildOfClass("Tool")if B then q.Humanoid:EquipTool(B)end end;b:CaptureController()b:ClickButton1(Vector2.new(850,520))end end)end;task.wait(0.15)end end)local C=f:WaitForChild("PlayerGui")if C:FindFirstChild("DeltaMobileV5")then C.DeltaMobileV5:Destroy()end;local D=Instance.new("ScreenGui")D.Name="DeltaMobileV5"D.ResetOnSpawn=false;D.Parent=C;local E=Instance.new("TextButton")E.Size=UDim2.new(0,55,0,55)E.Position=UDim2.new(0.05,0,0.25,0)E.BackgroundColor3=Color3.fromRGB(0,130,255)E.Text="MENU"E.TextColor3=Color3.fromRGB(255,255,255)E.Font=Enum.Font.SourceSansBold;E.TextSize=14;E.Active=true;E.Draggable=true;E.Parent=D;local F=Instance.new("UICorner")F.CornerRadius=UDim.new(1,0)F.Parent=E;local G=Instance.new("Frame")G.Size=UDim2.new(0,210,0,210)G.Position=UDim2.new(0.5,-105,0.5,-105)G.BackgroundColor3=Color3.fromRGB(25,25,30)G.Visible=false;G.Active=true;G.Draggable=true;G.Parent=D;local H=Instance.new("UICorner")H.CornerRadius=UDim.new(0,10)H.Parent=G;local I=Instance.new("TextLabel")I.Size=UDim2.new(1,0,0,35)I.BackgroundColor3=Color3.fromRGB(35,35,45)I.Text="  DELTA HUB v5.3"I.TextColor3=Color3.fromRGB(255,255,255)I.Font=Enum.Font.SourceSansBold;I.TextSize=13;I.TextXAlignment=Enum.TextXAlignment.Left;I.Parent=G;local J=Instance.new("UICorner")J.CornerRadius=UDim.new(0,10)J.Parent=I;local K=Instance.new("UIListLayout")K.Padding=UDim.new(0,5)K.SortOrder=Enum.SortOrder.LayoutOrder;local L=Instance.new("Frame")L.Size=UDim2.new(0.9,0,0.75,0)L.Position=UDim2.new(0.05,0,0.22,0)L.BackgroundTransparency=1;L.Parent=G;K.Parent=L;local function M(N,O)local P=Instance.new("TextButton")P.Size=UDim2.new(1,0,0,35)P.BackgroundColor3=Color3.fromRGB(45,45,55)P.Text=N..": OFF"P.TextColor3=Color3.fromRGB(255,80,80)P.Font=Enum.Font.SourceSansBold;P.TextSize=13;P.Parent=L;local c=Instance.new("UICorner")c.CornerRadius=UDim.new(0,6)c.Parent=P;P.MouseButton1Click:Connect(function()_G[O]=not _G[O]if _G[O]then P.Text=N..": ON"P.TextColor3=Color3.fromRGB(80,255,80)P.BackgroundColor3=Color3.fromRGB(45,60,45)else P.Text=N..": OFF"P.TextColor3=Color3.fromRGB(255,80,80)P.BackgroundColor3=Color3.fromRGB(45,45,55)end end)end;M("Обычная Атака","SafeAttack")M("Фарм Летая","FlyBotFarm")M("Ходить по воде","WalkOnWater")M("Убрать урон воды","NoWaterDamage")E.MouseButton1Click:Connect(function()G.Visible=not G.Visible end)
+-- ====================================================================
+-- DELTA PRO HUB: ПОЛНЫЙ ПЕРВОНАЧАЛЬНЫЙ ВИД (ИСПРАВЛЕННЫЙ)
+-- ====================================================================
+
+_G.SafeAttack = false
+_G.FlyBotFarm = false
+_G.WalkOnWater = false
+_G.NoWaterDamage = false
+
+-- Сервисы Roblox
+local Players = game:GetService("Players")
+local VirtualUser = game:GetService("VirtualUser")
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local ADMIN_GROUPS = { 4342932, 1200769 }
+local FarmSpeed = 80 -- Безопасная скорость полета для обхода античита
+
+-- ====================================================================
+-- СИСТЕМА ЗАЩИТЫ (АНТИ-АДМИН И ANTI-AFK)
+-- ====================================================================
+local function LeaveServer()
+    _G.SafeAttack = false
+    _G.FlyBotFarm = false
+    pcall(function()
+        local servers = HttpService:JSONDecode(game:HttpGet("https://roblox.com" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
+        for _, server in pairs(servers.data) do
+            if server.playing < server.maxPlayers and server.id ~= game.JobId then
+                TeleportService:TeleportToPlaceInstance(game.PlaceId, server.id, LocalPlayer)
+                break
+            end
+        end
+    end)
+    task.wait(1)
+    LocalPlayer:Kick("Анти-Админ: Экстренный выход!")
+end
+
+local function CheckPlayer(player)
+    if player == LocalPlayer then return end
+    pcall(function()
+        for _, groupId in pairs(ADMIN_GROUPS) do
+            if player:IsInGroup(groupId) then LeaveServer() return end
+        end
+        local name = player.Name:lower()
+        if name:find("admin") or name:find("mod") or name:find("zioles") or name:find("uzoth") then LeaveServer() end
+    end)
+end
+
+for _, p in pairs(Players:GetPlayers()) do CheckPlayer(p) end
+Players.PlayerAdded:Connect(CheckPlayer)
+
+-- Невидимый Anti-AFK
+pcall(function()
+    LocalPlayer.Idled:Connect(function()
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new(0, 0))
+    end)
+end)
+
+-- ====================================================================
+-- ЛОГИКА ФУНКЦИЙ ВОДЫ
+-- ====================================================================
+
+-- 1. Создание физической платформы под ногами
+local WaterPlatform = Instance.new("Part")
+WaterPlatform.Size = Vector3.new(50, 2, 50)
+WaterPlatform.Transparency = 1 
+WaterPlatform.Anchored = true
+WaterPlatform.CanCollide = false
+WaterPlatform.Parent = workspace
+
+RunService.RenderStepped:Connect(function()
+    pcall(function()
+        local character = LocalPlayer.Character
+        if character and character:FindFirstChild("HumanoidRootPart") and _G.WalkOnWater then
+            local pos = character.HumanoidRootPart.Position
+            if pos.Y <= 25 then 
+                WaterPlatform.CFrame = CFrame.new(pos.X, 11, pos.Z)
+                WaterPlatform.CanCollide = true
+            else
+                WaterPlatform.CanCollide = false
+            end
+        else
+            WaterPlatform.CanCollide = false
+        end
+    end)
+end)
+
+-- 2. Отключение урона от касания воды
+task.spawn(function()
+    while true do
+        pcall(function()
+            for _, v in pairs(workspace:GetDescendants()) do
+                if v.Name == "Water" or v.Name == "Sea" then
+                    if v:IsA("Part") or v:IsA("MeshPart") then 
+                        v.CanTouch = not _G.NoWaterDamage 
+                    end
+                end
+            end
+        end)
+        task.wait(3)
+    end
+end)
+
+-- ====================================================================
+-- ЛОГИКА АВТО-ФАРМА И ПОИСКА БОТОВ
+-- ====================================================================
+
+-- Функция поиска ближайшего врага
+local function GetClosestEnemy()
+    local Closest = nil
+    local MaxDistance = math.huge
+    local character = LocalPlayer.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local targets = workspace:FindFirstChild("Enemies") or workspace
+        for _, enemy in pairs(targets:GetChildren()) do
+            if enemy:IsA("Model") and enemy:FindFirstChild("HumanoidRootPart") and enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+                if enemy.Name ~= LocalPlayer.Name then
+                    local distance = (enemy.HumanoidRootPart.Position - character.HumanoidRootPart.Position).Magnitude
+                    if distance < MaxDistance and distance < 250 then
+                        MaxDistance = distance
+                        Closest = enemy
+                    end
+                end
+            end
+        end
+    end
+    return Closest
+end
+
+-- Поток летающего автофарма
+task.spawn(function()
+    while true do
+        if _G.FlyBotFarm then
+            pcall(function()
+                local character = LocalPlayer.Character
+                if character and character:FindFirstChild("HumanoidRootPart") and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 then
+                    local targetEnemy = GetClosestEnemy()
+                    if targetEnemy then
+                        -- Включаем левитацию
+                        if not character.HumanoidRootPart:FindFirstChild("BF_Velocity") then
+                            local bv = Instance.new("BodyVelocity")
+                            bv.Name = "BF_Velocity"
+                            bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+                            bv.Velocity = Vector3.new(0, 0, 0)
+                            bv.Parent = character.HumanoidRootPart
+                        end
+                        
+                        local targetPos = targetEnemy.HumanoidRootPart.Position + Vector3.new(0, 6, 0)
+                        local distance = (targetPos - character.HumanoidRootPart.Position).Magnitude
+                        
+                        if distance > 2 then
+                            character.HumanoidRootPart.BF_Velocity.Velocity = (targetPos - character.HumanoidRootPart.Position).Unit * FarmSpeed
+                        else
+                            character.HumanoidRootPart.BF_Velocity.Velocity = Vector3.new(0, 0, 0)
+                        end
+                        
+                        character.HumanoidRootPart.CFrame = CFrame.new(character.HumanoidRootPart.Position, targetEnemy.HumanoidRootPart.Position)
+                        
+                        -- Автоматически берем оружие и атакуем
+                        if not character:FindFirstChildOfClass("Tool") then
+                            local tool = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
+                            if tool then character.Humanoid:EquipTool(tool) end
+                        end
+                        VirtualUser:CaptureController()
+                        VirtualUser:ClickButton1(Vector2.new(850, 520))
+                    else
+                        if character.HumanoidRootPart:FindFirstChild("BF_Velocity") then
+                            character.HumanoidRootPart.BF_Velocity.Velocity = Vector3.new(0, 0, 0)
+                        end
+                    end
+                end
+            end)
+        else
+            -- Возврат обычной физики персонажа
+            pcall(function()
+                local character = LocalPlayer.Character
+                if character and character:FindFirstChild("HumanoidRootPart") then
+                    if character.HumanoidRootPart:FindFirstChild("BF_Velocity") then
+                        character.HumanoidRootPart.BF_Velocity:Destroy()
+                    end
+                end
+            end)
+        end
+        task.wait(0.05)
+    end
+end)
+
+-- Обычный кликер (работает на суше)
+task.spawn(function()
+    while true do
+        if _G.SafeAttack and not _G.FlyBotFarm then
+            pcall(function()
+                local character = LocalPlayer.Character
+                if character and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0 then
+                    if not character:FindFirstChildOfClass("Tool") then
+                        local tool = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
+                        if tool then character.Humanoid:EquipTool(tool) end
+                    end
+                    VirtualUser:CaptureController()
+                    VirtualUser:ClickButton1(Vector2.new(850, 520))
+                end
+            end)
+        end
+        task.wait(0.15)
+    end
+end)
+
+-- ====================================================================
+-- ИНТЕРФЕЙС GUI (МОБИЛЬНЫЙ / DELTA)
+-- ====================================================================
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+if PlayerGui:FindFirstChild("DeltaMobileV5") then PlayerGui.DeltaMobileV5:Destroy() end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DeltaMobileV5"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+-- Круглая кнопка MENU
+local MenuBtn = Instance.new("TextButton")
+MenuBtn.Size = UDim2.new(0, 55, 0, 55)
+MenuBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
+MenuBtn.BackgroundColor3 = Color3.fromRGB(0, 130, 255)
+MenuBtn.Text = "MENU"
+MenuBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MenuBtn.Font = Enum.Font.SourceSansBold
+MenuBtn.TextSize = 14
+MenuBtn.Active = true
+MenuBtn.Draggable = true
+MenuBtn.Parent = ScreenGui
+
+local corner1 = Instance.new("UICorner")
+corner1.CornerRadius = UDim.new(1, 0)
+corner1.Parent = MenuBtn
+
+-- Панель настроек
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 210, 0, 210)
+Frame.Position = UDim2.new(0.5, -105, 0.5, -105)
+Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+Frame.Visible = false
+Frame.Active = true
+Frame.Draggable = true
+Frame.Parent = ScreenGui
+
+local corner2 = Instance.new("UICorner")
