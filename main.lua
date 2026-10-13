@@ -1,5 +1,5 @@
 -- ====================================================================
--- DH PREMIEM HUB v7.0: REDZ STYLE REWRITE (SAFE & MULTI-TAB)
+-- DH PREMIUM HUB v7.1: REDZ STYLE REWRITE (SAFE & MULTI-TAB - FIXED)
 -- ====================================================================
 
 _G.SafeFlyFarm = false
@@ -18,9 +18,7 @@ local LocalPlayer = Players.LocalPlayer
 local FarmSpeed = 75
 local ADMIN_GROUPS = { 4342932, 1200769 }
 
--- ====================================================================
--- СИСТЕМЫ БЕЗОПАСНОСТИ (ANTI-AFK & ANTI-ADMIN)
--- ====================================================================
+-- ANTI-AFK
 pcall(function()
     LocalPlayer.Idled:Connect(function()
         VirtualUser:CaptureController()
@@ -28,6 +26,7 @@ pcall(function()
     end)
 end)
 
+-- ANTI-ADMIN
 local function LeaveServer()
     _G.SafeFlyFarm = false
     _G.SafeAttack = false
@@ -58,26 +57,21 @@ end
 for _, p in pairs(Players:GetPlayers()) do CheckPlayer(p) end
 Players.PlayerAdded:Connect(CheckPlayer)
 
--- ====================================================================
--- ЛОГИКА ФУНКЦИЙ (ФАРМ, ВОЛИ, ВОДЫ)
--- ====================================================================
-
--- Функция автоматического включения Воли (Haki)
+-- АВТО-ХАКИ
 task.spawn(function()
     while true do
         if _G.AutoHaki then
             pcall(function()
-                -- Проверяем, включена ли воля (если персонаж не покрылся черным)
                 if LocalPlayer.Character and not LocalPlayer.Character:FindFirstChild("HasBuso") then
-                    -- Отправляем безопасный запрос на сервер для активации Хаки
                     game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Buso")
                 end
             end)
         end
-        task.wait(4) -- Проверка каждые 4 секунды
+        task.wait(4)
     end
 end)
 
+-- ПОИСК БОТОВ
 local function GetClosestEnemy()
     local Closest = nil
     local MaxDistance = math.huge
@@ -99,7 +93,7 @@ local function GetClosestEnemy()
     return Closest
 end
 
--- Полет
+-- ПОТOК ПОЛЕТА
 task.spawn(function()
     while true do
         if _G.SafeFlyFarm then
@@ -150,7 +144,7 @@ task.spawn(function()
     end
 end)
 
--- Обычный кликер
+-- ОБЫЧНЫЙ КЛИКЕР
 task.spawn(function()
     while true do
         if _G.SafeAttack and not _G.SafeFlyFarm then
@@ -170,7 +164,7 @@ task.spawn(function()
     end
 end)
 
--- Платформа воды
+-- ВОДНАЯ ПЛАТФОРМА
 local WaterPlatform = Instance.new("Part")
 WaterPlatform.Size = Vector3.new(60, 2, 60)
 WaterPlatform.Transparency = 1 
@@ -195,7 +189,7 @@ RunService.RenderStepped:Connect(function()
     end)
 end)
 
--- Урон воды
+-- УРОН ВОДЫ
 task.spawn(function()
     while true do
         pcall(function()
@@ -209,9 +203,7 @@ task.spawn(function()
     end
 end)
 
--- ====================================================================
--- КРАСИВЫЙ ИНТЕРФЕЙС GUI (В СТИЛЕ REDZ HUB)
--- ====================================================================
+-- СОЗДАНИЕ ИНТЕРФЕЙСА
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 if PlayerGui:FindFirstChild("DH_PremiumHub") then PlayerGui.DH_PremiumHub:Destroy() end
 
@@ -220,7 +212,7 @@ ScreenGui.Name = "DH_PremiumHub"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = PlayerGui
 
--- Круглая кнопка DH с RGB обводкой
+-- Круглая кнопка DH
 local MenuBtn = Instance.new("TextButton")
 MenuBtn.Size = UDim2.new(0, 55, 0, 55)
 MenuBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
@@ -237,6 +229,28 @@ local c1 = Instance.new("UICorner") c1.CornerRadius = UDim.new(1, 0) c1.Parent =
 local Stroke = Instance.new("UIStroke") Stroke.Thickness = 2.5; Stroke.Parent = MenuBtn
 task.spawn(function() while true do for i = 0, 1, 0.005 do Stroke.Color = Color3.fromHSV(i, 1, 1) task.wait(0.02) end end end)
 
--- Главное премиум окно в стиле Redz
+-- Главная панель в стиле Redz (ИСПРАВЛЕНО)
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 360, 0, 230) -- Широкое окно под вкладки
+MainFrame.Size = UDim2.new(0, 360, 0, 230)
+MainFrame.Position = UDim2.new(0.5, -180, 0.5, -115)
+MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+MainFrame.Visible = false
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local c2 = Instance.new("UICorner") c2.CornerRadius = UDim.new(0, 10) c2.Parent = MainFrame
+
+-- Сайдбар
+local Sidebar = Instance.new("Frame")
+Sidebar.Size = UDim2.new(0, 90, 1, 0)
+Sidebar.BackgroundColor3 = Color3.fromRGB(13, 13, 18)
+Sidebar.Parent = MainFrame
+local c3 = Instance.new("UICorner") c3.CornerRadius = UDim.new(0, 10) c3.Parent = Sidebar
+
+local SideLayout = Instance.new("UIListLayout")
+SideLayout.Padding = UDim.new(0, 4)
+SideLayout.SortOrder = Enum.SortOrder.LayoutOrder
+SideLayout.Parent = Sidebar
+
+-- Контент
