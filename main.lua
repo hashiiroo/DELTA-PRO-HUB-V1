@@ -14,7 +14,7 @@ local LocalPlayer = Players.LocalPlayer
 local ADMIN_GROUPS = { 4342932, 1200769 }
 local FarmSpeed = 80
 
--- 1. АНТИ-АДМИН
+-- 1. ANTI-ADMIN
 local function LeaveServer()
     _G.SafeAttack = false
     _G.FlyBotFarm = false
@@ -29,7 +29,7 @@ local function LeaveServer()
         end
     end)
     task.wait(1.5)
-    LocalPlayer:Kick("Безопасный выход!")
+    LocalPlayer:Kick("Safe Leave!")
 end
 
 local function CheckPlayer(player)
@@ -53,7 +53,7 @@ pcall(function()
     end)
 end)
 
--- 3. АВТО-ХАКИ (ВОЛЯ)
+-- 3. AUTO-HAKI
 task.spawn(function()
     while true do
         if _G.AutoHaki then
@@ -67,7 +67,7 @@ task.spawn(function()
     end
 end)
 
--- 4. ПОИСК ДЛЯ ЛЕТАЮЩЕГО ФАРМА
+-- 4. CLOSEST ENEMY FINDER
 local function GetClosestEnemy()
     local Closest = nil
     local MaxDistance = math.huge
@@ -89,7 +89,7 @@ local function GetClosestEnemy()
     return Closest
 end
 
--- 5. ПОТОК ПОЛЕТА И ФАРМА
+-- 5. FLY FARM PROCESS
 task.spawn(function()
     while true do
         if _G.FlyBotFarm then
@@ -144,7 +144,7 @@ task.spawn(function()
     end
 end)
 
--- 6. ОБЫЧНЫЙ АВТОКЛИКЕР
+-- 6. CLICKER
 task.spawn(function()
     while true do
         if _G.SafeAttack and not _G.FlyBotFarm then
@@ -164,7 +164,7 @@ task.spawn(function()
     end
 end)
 
--- 7. ФУНКЦИИ ВОДЫ
+-- 7. WATER FUNCTIONS
 local WaterPlatform = Instance.new("Part")
 WaterPlatform.Size = Vector3.new(40, 2, 40)
 WaterPlatform.Transparency = 1 
@@ -205,17 +205,17 @@ task.spawn(function()
 end)
 
 -- ====================================================================
--- УСТОЙЧИВЫЙ ИНТЕРФЕЙС GUI (ВЕРСИЯ v6.3 БЕЗ СИНТАКСИЧЕСКИХ ОШИБОК)
+-- GUI INTERFACE (ENGLISH ONLY TO BYPASS DELTA COCODING BUG)
 -- ====================================================================
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-if PlayerGui:FindFirstChild("DeltaMobileTouchV6") then PlayerGui.DeltaMobileTouchV6:Destroy() end
+if PlayerGui:FindFirstChild("DeltaMobileEnglishV6") then PlayerGui.DeltaMobileEnglishV6:Destroy() end
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "DeltaMobileTouchV6"
+ScreenGui.Name = "DeltaMobileEnglishV6"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = PlayerGui
 
--- Кружок DH с темно-красным фоном и RGB обводкой
+-- Кружок DH
 local MenuBtn = Instance.new("TextButton")
 MenuBtn.Size = UDim2.new(0, 55, 0, 55)
 MenuBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
@@ -235,7 +235,7 @@ RGBStroke.Thickness = 2.5
 RGBStroke.Parent = MenuBtn
 task.spawn(function() while true do for i = 0, 1, 0.005 do RGBStroke.Color = Color3.fromHSV(i, 1, 1) task.wait(0.02) end end end)
 
--- Панель настроек (Монолитная)
+-- Панель настроек
 local MainFrame = Instance.new("Frame")
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
@@ -250,194 +250,8 @@ local Title = Instance.new("TextLabel")
 Title.Parent = MainFrame
 Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
-Title.Text = "  DELTA HUB V6.3"
+Title.Text = "  DELTA HUB V6.4"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.SourceSansBold
 Title.TextSize = 13
-(
-		button,
-		TweenInfo.new(
-			0.18,
-			Enum.EasingStyle.Quad,
-			Enum.EasingDirection.Out
-		),
-		{
-			BackgroundColor3 = ACCENT,
-
-			Size = originalSize,
-			Position = originalPosition
-		}
-	):Play()
-
-	TweenService:Create(
-		buttonStroke,
-		TweenInfo.new(0.18),
-		{
-			Transparency = 0.82
-		}
-	):Play()
-
-end)
-
---==================================================
--- COPY ACTION
---==================================================
-
-button.MouseButton1Click:Connect(function()
-
-	-- Click animation
-	TweenService:Create(
-		button,
-		TweenInfo.new(0.08),
-		{
-			Size = UDim2.new(1, -42, 0, 46)
-		}
-	):Play()
-
-	task.wait(0.08)
-
-	TweenService:Create(
-		button,
-		TweenInfo.new(0.12),
-		{
-			Size = originalSize
-		}
-	):Play()
-
-	-- Copy
-	setclipboard(SCRIPT_LINK)
-
-	-- Change text
-	buttonText.Text = "LINK COPIED!"
-
-	-- Change to orange
-	TweenService:Create(
-		button,
-		TweenInfo.new(0.2),
-		{
-			BackgroundColor3 = COPIED_COLOR
-		}
-	):Play()
-
-	-- Wait
-	task.wait(1.5)
-
-	-- Return to normal
-	buttonText.Text = "COPY LINK SCRIPT"
-
-	TweenService:Create(
-		button,
-		TweenInfo.new(0.2),
-		{
-			BackgroundColor3 = ACCENT
-		}
-	):Play()
-
-end)
-
---==================================================
--- CLOSE ANIMATION
---==================================================
-
-local function closeGui()
-
-	TweenService:Create(
-		frame,
-		TweenInfo.new(
-			0.25,
-			Enum.EasingStyle.Back,
-			Enum.EasingDirection.In
-		),
-		{
-			Size = UDim2.fromOffset(340, 210),
-
-			Position = UDim2.new(
-				0.5,
-				0,
-				0.5,
-				15
-			)
-		}
-	):Play()
-
-	TweenService:Create(
-		stroke,
-		TweenInfo.new(0.2),
-		{
-			Transparency = 1
-		}
-	):Play()
-
-	task.wait(0.25)
-
-	gui:Destroy()
-
-end
-
-close.MouseButton1Click:Connect(closeGui)
-
---==================================================
--- OPEN ANIMATION
---==================================================
-
-frame.Size = UDim2.fromOffset(330, 200)
-
-TweenService:Create(
-	frame,
-	TweenInfo.new(
-		0.45,
-		Enum.EasingStyle.Back,
-		Enum.EasingDirection.Out
-	),
-	{
-		Size = UDim2.fromOffset(380, 235),
-
-		-- Perfect center
-		Position = UDim2.new(
-			0.5,
-			0,
-			0.5,
-			0
-		)
-	}
-):Play()
-
---==================================================
--- BORDER PULSE
---==================================================
-
-task.spawn(function()
-
-	while gui.Parent do
-
-		TweenService:Create(
-			stroke,
-			TweenInfo.new(
-				1.2,
-				Enum.EasingStyle.Sine,
-				Enum.EasingDirection.InOut
-			),
-			{
-				Transparency = 0.75
-			}
-		):Play()
-
-		task.wait(1.2)
-
-		TweenService:Create(
-			stroke,
-			TweenInfo.new(
-				1.2,
-				Enum.EasingStyle.Sine,
-				Enum.EasingDirection.InOut
-			),
-			{
-				Transparency = 0.35
-			}
-		):Play()
-
-		task.wait(1.2)
-
-	end
-
-end)
+Title.TextXAlignment = Enum.TextXAlignment.Left
